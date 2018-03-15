@@ -20,7 +20,7 @@ public class ReflectionObjectPool<T> extends AbstractObjectPool<T>
         }
         catch (NoSuchMethodException e)
         {
-            throw new IllegalArgumentException("Type parameter does not have a default (zero-argument) constructor: " + typeParameterClass);
+            throw new IllegalArgumentException("Type parameter does not have a default (zero-argument) constructor: " + typeParameterClass.getName());
         }
         populate();
     }

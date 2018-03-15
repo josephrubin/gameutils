@@ -19,11 +19,10 @@ public class Service<I>
 
     public void removeMember(I implementor)
     {
-        if (!members.contains(implementor))
+        if (!members.remove(implementor))
         {
             throw new IllegalStateException("Supplied object does not have the service " + getClass().getName() + " to remove!");
         }
-        members.remove(implementor);
     }
 
     public boolean hasMember(I implementor)

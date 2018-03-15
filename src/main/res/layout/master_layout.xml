@@ -6,12 +6,12 @@
     android:orientation="vertical"
     android:id="@id/root">
 
-    <ViewStub android:id="@+id/mainMenuStub"
-              android:inflatedId="@id/mainScreen"
+    <ViewStub android:id="@id/menuLayoutStub"
+              android:inflatedId="@id/menuSection"
               android:layout_height="match_parent"
               android:layout_width="match_parent"/>
 
     <include layout="@layout/game_layout"
-             android:id="@id/gameScreen"/>
+             android:id="@id/gameSection"/>
 
 </LinearLayout>

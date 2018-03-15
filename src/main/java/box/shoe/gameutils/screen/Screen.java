@@ -1,8 +1,8 @@
 package box.shoe.gameutils.screen;
 
+import android.graphics.Canvas;
+import android.support.annotation.CheckResult;
 import android.view.View;
-
-import box.shoe.gameutils.engine.GameState;
 
 /**
  * Created by Joseph on 1/1/2018.
@@ -11,25 +11,61 @@ import box.shoe.gameutils.engine.GameState;
 
 public interface Screen
 {
-    // Called before drawing begins, once the game, and thus the screen, has dimensions.
-    void initialize();
-    boolean hasInitialized();
+    // __________
+    // RENDERING.
 
-    void preparePaint();
-    void clearScreen();
-    boolean hasPreparedPaint();
+    /**
+     * Begin the process of rendering a frame to this Screen, which will be drawn onto a View.
+     * Do not call if isActive() returns false.
+     * Do not call if isRendering() returns true.
+     * @return the Canvas that should be drawn to for pixels to appear on the View. This Canvas may only be touched
+     *          by the thread that called startRender().
+     */
+    @CheckResult
+    Canvas startRender();
 
-    void paintFrame(GameState gameState);
+    /**
+     * Checks if the Screen is in the process of rendering a frame.
+     * @return true if isRender() was called more recently than endRender(), and false otherwise.
+     */
+    boolean isRendering();
 
+    /**
+     * End the process of rendering a frame, and show the pixels draw to the Canvas returned by startRender() to the
+     * underlying View.
+     */
+    void endRender();
+
+    // ________________
+    // EVENT LISTENERS.
+
+    // should run right away if event already happened. auto removed when surface destroyed (view removed from screen (onStop called in Activity))
+    void setReadyListener(ReadyListener readyListener);
+    void removeReadyListener();
+
+    // auto removed when surface destroyed (view removed from screen (onStop called in Activity))
+    void setSizeChangedListener(SizeChangedListener sizeChangedListener);
+    void removeSizeChangedListener();
+
+    boolean isActive();
+
+    ///// OLD V V V V
+    //       todo: figure out whats needed and what is not
     void cleanup();
 
     int getWidth();
     int getHeight();
 
     View asView();
+    // ^^^^^^^^^^^^^
 
-    void setOnTouchListener(View.OnTouchListener onTouchListener);
+    interface ReadyListener
+    {
+        void onReady(int screenWidth, int screenHeight);
+    }
 
-    void setReadyForPaintingListener(Runnable readyForPaintingListener);
-    void clearReadyForPaintingListener();
+    interface SizeChangedListener
+    {
+        void onSizeChanged(int newScreenWidth, int newScreenHeight, int oldScreenWidth, int oldScreenHeight);
+    }
 }

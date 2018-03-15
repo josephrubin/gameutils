@@ -9,14 +9,13 @@ import android.support.annotation.NonNull;
 import android.view.TextureView;
 import android.view.View;
 
-import box.shoe.gameutils.engine.GameState;
-
 /**
  * Created by Joseph on 10/23/2017.
+ * @deprecated
  */
 //TODO: unfinished. don't use.
-public abstract class AbstractTextureViewScreen extends TextureView implements TextureView.SurfaceTextureListener, Screen
-{
+public abstract class AbstractTextureViewScreen// extends TextureView implements TextureView.SurfaceTextureListener, Screen
+{/*
     private volatile boolean surfaceReady = false;
     private boolean preparedToPaint = false;
 
@@ -47,12 +46,9 @@ public abstract class AbstractTextureViewScreen extends TextureView implements T
         surfaceCanvas = lockCanvas();
 
         // Set coordinate origin to (0, 0) and make +x = right, +y = up.
-        /*surfaceCanvas.translate(0, bufferCanvas.getHeight());
-        surfaceCanvas.scale(1, -1);*/
-
         preparedToPaint = true;
-    }
-
+    }*/
+/*
     private void checkState()
     {
         if (!hasPreparedPaint())
@@ -98,7 +94,7 @@ public abstract class AbstractTextureViewScreen extends TextureView implements T
         return this;
     }
 
-    public void clearReadyForPaintingListener() //Irreversable
+    public void removeReadyListener() //Irreversable
     {
         readyForPaintingListener = null;
     }
@@ -139,7 +135,7 @@ public abstract class AbstractTextureViewScreen extends TextureView implements T
         if (hasDimensions && readyForPaintingListener != null)
         {
             readyForPaintingListener.run();
-            clearReadyForPaintingListener();
+            removeReadyListener();
         }
     }
 
@@ -161,7 +157,7 @@ public abstract class AbstractTextureViewScreen extends TextureView implements T
         if (hasDimensions && surfaceReady && readyForPaintingListener != null)
         {
             readyForPaintingListener.run();
-            clearReadyForPaintingListener();
+            removeReadyListener();
         }
     }
 
@@ -172,5 +168,5 @@ public abstract class AbstractTextureViewScreen extends TextureView implements T
     public void setWillNotDraw(boolean willNotDraw)
     {
         throw new UnsupportedOperationException("Can not disable drawing, because that will break the screen.");
-    }
+    }*/
 }

@@ -7,12 +7,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@id/gameContainer"
+        android:id="@id/gameScreenView"
         android:orientation="horizontal">
     </LinearLayout>
 
     <ViewStub android:id="@+id/pauseMenuStub"
-              android:inflatedId="@id/pauseMenu"
+              android:inflatedId="@id/pauseLayout"
               android:layout_height="match_parent"
               android:layout_width="match_parent"/>
 

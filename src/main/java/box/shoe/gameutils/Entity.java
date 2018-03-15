@@ -3,19 +3,22 @@ package box.shoe.gameutils;
 import android.support.annotation.CallSuper;
 import android.util.Log;
 
+import box.gift.gameutils.BuildConfig;
+
 /**
  * Created by Joseph on 12/9/2017.
  * A game object which occupies position and space in the game and can move around.
  * An Entity is not necessarily fit for rendering.
- * See DisplayEntity for an Entity which is meant to be displayed
- * during the game (occupies position and space on the screen).
+ * @see Renderable for an Entity which is meant to be displayed during the game.
  */ //TODO: type of short-lived entity that exists only for a number of frames? (particle)
-public class Entity/* implements Poolable*/
+public class Entity implements Updatable, Interpolatable /* Poolable*/
 {
     // The game-space which is occupied by this Entity.
     public AABB body;
+    // The screen-space which is occupied by this Entity.
+    public AABB display;
 
-    // Vector which represents how many x and y units the position will change by per update.
+    // Vector which represents how many x and y units the body will offset by per update.
     public Vector velocity;
     // Vector which represents how many x and y units the velocity will change by per update.
     public Vector acceleration;
@@ -82,17 +85,20 @@ public class Entity/* implements Poolable*/
             throw new IllegalArgumentException("Height cannot be less than 0: " + initialHeight);
         }
         body = new AABB(initialX, initialY, initialX + initialWidth, initialY + initialHeight);
+        display = new AABB(body);
         velocity = initialVelocity;
         acceleration = initialAcceleration;
     }
 
     /**
+     * Semi-Implicit Euler integration -
      * Updates velocity based on current acceleration,
      * and then updates position based on new velocity.
      * We do not need to multiply by dt because every time-step is of equal length.
      */
+    @Override
     @CallSuper
-    public void update() //TODO: return some data? like boolean which says if this should be destroyed? or have that a Weaver event?
+    public void update()
     {
         // We will update velocity based on acceleration first,
         // and update position based on velocity second.
@@ -135,7 +141,7 @@ public class Entity/* implements Poolable*/
     {
         try
         {
-            if (!cleaned) //TODO: only in debug mode
+            if (!cleaned && BuildConfig.DEBUG)
             {
                 // We log a warning because throwing an error here will not stop program execution
                 // anyway and there is technically no 'error' here. For all we know, the Entities do not
@@ -161,5 +167,29 @@ public class Entity/* implements Poolable*/
     public final int hashCode()
     {
         return super.hashCode();
+    }
+
+    @Override
+    public int getInterpValuesArrayMaxIndex()
+    {
+        return 3;
+    }
+
+    @Override
+    public void saveInterpValues(float[] out)
+    {
+        out[0] = body.left;
+        out[1] = body.top;
+        out[2] = body.right;
+        out[3] = body.bottom;
+    }
+
+    @Override
+    public void loadInterpValues(float[] in)
+    {
+        display.left = in[0];
+        display.top = in[1];
+        display.right = in[2];
+        display.bottom = in[3];
     }
 }

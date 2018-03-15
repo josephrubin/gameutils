@@ -8,7 +8,7 @@
         android:layout_width="90dp"
         android:layout_height="90dp"
         android:contentDescription="Resume"
-        android:onClick="r"
+        android:onClick="resumeGame"
         android:src="@android:drawable/ic_media_play"/>
 
     <ImageButton

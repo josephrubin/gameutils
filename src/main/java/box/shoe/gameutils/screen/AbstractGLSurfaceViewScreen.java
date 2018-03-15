@@ -10,14 +10,13 @@ import org.jetbrains.annotations.NotNull;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import box.shoe.gameutils.engine.GameState;
-
 /**
  * Created by Joseph on 1/31/2018.
+ * @deprecated
  */
 //TODO: unfinished, untested. don't use. it might even be removed
-public abstract class AbstractGLSurfaceViewScreen extends GLSurfaceView implements Screen, GLSurfaceView.Renderer
-{
+public abstract class AbstractGLSurfaceViewScreen// extends GLSurfaceView implements Screen, GLSurfaceView.Renderer
+{/*
     private volatile boolean surfaceReady = false;
     private boolean hasDimensions = false;
     private boolean preparedToPaint = false;
@@ -53,7 +52,7 @@ public abstract class AbstractGLSurfaceViewScreen extends GLSurfaceView implemen
             if (readyForPaintingListener != null)
             {
                 readyForPaintingListener.run();
-                clearReadyForPaintingListener();
+                removeReadyListener();
             }
         }
     }
@@ -122,7 +121,7 @@ public abstract class AbstractGLSurfaceViewScreen extends GLSurfaceView implemen
     }
 
     @Override
-    public void clearReadyForPaintingListener()
+    public void removeReadyListener()
     {
         readyForPaintingListener = null;
     }
@@ -137,5 +136,5 @@ public abstract class AbstractGLSurfaceViewScreen extends GLSurfaceView implemen
         {
             throw new IllegalStateException("Surface is not ready to paint. Please call canVisualize() to check.");
         }
-    }
+    }*/
 }

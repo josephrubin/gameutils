@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.RectF;
 
 import box.shoe.gameutils.AABB;
-import box.shoe.gameutils.DisplayEntity;
+import box.shoe.gameutils.Entity;
 
 /**
  * Created by Joseph on 2/20/2018.
@@ -107,31 +107,31 @@ public class RectCamera implements Camera
     }
 
     @Override
-    public boolean isVisible(DisplayEntity displayEntity)
+    public boolean isVisible(Entity entity)
     {
-        return displayEntity.display.intersects(visibleBounds);
+        return entity.display.intersects(visibleBounds);
     }
 
     // More visibility checks given that we are a rectangle.
     // A maximum of two of these can be true at any particular time (corners)?
 
-    public boolean isPastLeft(DisplayEntity displayEntity)
+    public boolean isPastLeft(Entity entity)
     {
-        return displayEntity.display.right < visibleBounds.left;
+        return entity.display.right < visibleBounds.left;
     }
 
-    public boolean isPastTop(DisplayEntity displayEntity)
+    public boolean isPastTop(Entity entity)
     {
-        return displayEntity.display.bottom < visibleBounds.top;
+        return entity.display.bottom < visibleBounds.top;
     }
 
-    public boolean isPastRight(DisplayEntity displayEntity)
+    public boolean isPastRight(Entity entity)
     {
-        return displayEntity.display.left > visibleBounds.right;
+        return entity.display.left > visibleBounds.right;
     }
 
-    public boolean isPastBottom(DisplayEntity displayEntity)
+    public boolean isPastBottom(Entity entity)
     {
-        return displayEntity.display.top > visibleBounds.bottom;
+        return entity.display.top > visibleBounds.bottom;
     }
 }

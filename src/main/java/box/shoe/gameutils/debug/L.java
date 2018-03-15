@@ -3,6 +3,8 @@ package box.shoe.gameutils.debug;
 import android.util.Log;
 import java.util.HashMap;
 
+import box.gift.gameutils.BuildConfig;
+
 /**
  * Logs debug output to the console on multiple channels.
  * Each channel can be disabled separately to prevent output being sent on them (L.disableChannel).
@@ -12,6 +14,7 @@ import java.util.HashMap;
  * (And Strings, and StringBuilders implicitly created from concatenation will be a huge memory/cpu waste).
  * So please remove the L.d statements before release.
  */
+
 public class L
 {
     // Whether or not we will send any output to the console.
@@ -27,6 +30,11 @@ public class L
      */
     public static void d(Object msg, String channel)
     {
+        if (!BuildConfig.DEBUG)
+        {
+            return;
+        }
+
         // If the channel does not exist, create it and set enabled.
         if (!logChannels.containsKey(channel))
         {

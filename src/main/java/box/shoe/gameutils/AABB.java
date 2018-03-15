@@ -25,10 +25,13 @@ public class AABB extends RectF
      * @return true iff the specified AABB intersects this AABB. In
      *              no event is this AABB modified.
      */
-    public boolean intersects(RectF other) {
+    public boolean intersects(RectF other)
+    {
         return this.left < other.right && other.left < this.right
                 && this.top < other.bottom && other.top < this.bottom;
     }
+
+    // > Offsets
 
     /**
      * Offset to a specific (top) position,
@@ -36,7 +39,8 @@ public class AABB extends RectF
      *
      * @param newTop    The new "top" coordinate
      */
-    public void offsetTopTo(float newTop) {
+    public void offsetTopTo(float newTop)
+    {
         bottom += newTop - top;
         top = newTop;
     }
@@ -47,7 +51,8 @@ public class AABB extends RectF
      *
      * @param newRight    The new "right" coordinate
      */
-    public void offsetRightTo(float newRight) {
+    public void offsetRightTo(float newRight)
+    {
         left += newRight - right;
         right = newRight;
     }
@@ -58,7 +63,8 @@ public class AABB extends RectF
      *
      * @param newBottom    The new "bottom" coordinate
      */
-    public void offsetBottomTo(float newBottom) {
+    public void offsetBottomTo(float newBottom)
+    {
         top += newBottom - bottom;
         bottom = newBottom;
     }
@@ -69,7 +75,8 @@ public class AABB extends RectF
      *
      * @param newLeft    The new "left" coordinate
      */
-    public void offsetLeftTo(float newLeft) {
+    public void offsetLeftTo(float newLeft)
+    {
         right += newLeft - left;
         left = newLeft;
     }
@@ -81,11 +88,13 @@ public class AABB extends RectF
      * @param newCenterX    The new "center" x coordinate
      * @param newCenterY    The new "center" y coordinate
      */
-    public void offsetCenterTo(float newCenterX, float newCenterY) {
+    public void offsetCenterTo(float newCenterX, float newCenterY)
+    {
         offsetTo(newCenterX - width() / 2, newCenterY - height() / 2);
     }
 
     // >> Natural extension of the great RectF constructors.
+
     /**
      * Create a new empty AABB. All coordinates are initialized to 0.
      */

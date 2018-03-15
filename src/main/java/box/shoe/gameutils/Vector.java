@@ -1,48 +1,109 @@
 package box.shoe.gameutils;
 
+import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 
 import org.jetbrains.annotations.Contract;
 
-import java.util.Objects;
-
 /**
  * Created by Joseph on 10/21/2017.
- * A magnitude and a direction, described by x and y length values.
- * This class is IMMUTABLE.
+ * A magnitude and a direction in 2D space.
+ * This class is IMMUTABLE, so remember to use method return values (the original Vectors will not change).
+ * Any method which returns a Vector need not create a new one. If possible, it is able to return one
+ * of the arguments itself (e.g. onlyX returns the argument if the argument already has Y == 0).
+ * This class only has float precision.
  */
 
-public final class Vector
+public final class Vector //TODO: could change to double precision and cast to float when returning, but that may be unnecessary.
 {
     // Length in the +x (rightward) direction.
-    private final float x;
+    private final float X;
     // Length in the +y (downward) direction.
-    private final float y;
+    private final float Y;
 
-    // Consts.
     // The zero vector.
-    public static final Vector ZERO = new Vector(0, 0);
+    public static final Vector ZERO = Vector.fromCartesian(0, 0);
+
+    // Unit cardinal directions.
+    public static final Vector WEST = Vector.fromCartesian(-1, 0);
+    public static final Vector NORTH = Vector.fromCartesian(0, -1);
+    public static final Vector EAST = Vector.fromCartesian(1, 0);
+    public static final Vector SOUTH = Vector.fromCartesian(0, 1);
+
+    // Unit ordinal directions.
+    public static final Vector NORTH_WEST = NORTH.add(WEST).unit();
+    public static final Vector NORTH_EAST = NORTH.add(EAST).unit();
+    public static final Vector SOUTH_WEST = SOUTH.add(WEST).unit();
+    public static final Vector SOUTH_EAST = SOUTH.add(EAST).unit();
 
     /**
      * Constructs a new Vector.
-     * @param x the x length
-     * @param y the y length
+     * @param x the X length
+     * @param y the Y length
      */
-    public Vector(final float x, final float y)
+    private Vector(float x, float y)
     {
-        this.x = x;
-        this.y = y;
+        this.X = x;
+        this.Y = y;
     }
 
     /**
-     * Constructs a new Vector after casting the double parameters to floats.
-     * @param x the x length
-     * @param y the y length
+     * Constructs a Vector after casting the double parameters to floats.
+     * @param x the X length
+     * @param y the Y length
      */
-    public Vector(final double x, final double y)
+    private Vector(double x, double y)
     {
-        this.x = (float) x;
-        this.y = (float) y;
+        this.X = (float) x;
+        this.Y = (float) y;
+    }
+
+    /**
+     * Constructs a Vector from cartesian coordinate values.
+     * @param x the X length
+     * @param y the Y length
+     * @return a Vector with the specified X and Y values.
+     */
+    @NonNull
+    public static Vector fromCartesian(float x, float y)
+    {
+        return new Vector(x, y);
+    }
+
+    /**
+     * Constructs a Vector from cartesian coordinate values.
+     * @param x the X length (will be casted to float)
+     * @param y the Y length (will be casted to float)
+     * @return a Vector with the specified X and Y values, after casting them to float.
+     */
+    @NonNull
+    public static Vector fromCartesian(double x, double y)
+    {
+        return new Vector(x, y);
+    }
+
+    /**
+     * Constructs a Vector from polar coordinate values.
+     * @param magnitude the length
+     * @param thetaRadians the angle in radians
+     * @return a Vector from the specified magnitude and theta from the origin after converting to X, Y values (atCCW from +x).
+     */
+    @NonNull
+    public static Vector fromPolar(float magnitude, float thetaRadians)
+    {
+        return new Vector(magnitude * Math.cos(thetaRadians), magnitude * Math.sin(thetaRadians));
+    }
+
+    /**
+     * Constructs a Vector from polar coordinate values.
+     * @param magnitude the length (will be casted to float)
+     * @param thetaRadians the angle in radians (will be casted to float)
+     * @return a Vector from the specified magnitude and theta from the origin (CCW from +x).
+     */
+    @NonNull
+    public static Vector fromPolar(double magnitude, double thetaRadians)
+    {
+        return new Vector(magnitude * Math.cos(thetaRadians), magnitude * Math.sin(thetaRadians));
     }
 
     /**
@@ -51,13 +112,15 @@ public final class Vector
      */
     public double magnitude()
     {
-        return Math.sqrt((x * x) + (y * y));
+        // Equivalent of Math.sqrt(this.dot(this))
+        return Math.sqrt((X * X) + (Y * Y));
     }
 
     /**
      * Constructs a Vector in the same direction as this one, but with a magnitude of 1.
      * @return this Vector's unit Vector.
      */
+    @CheckResult
     @NonNull
     public Vector unit()
     {
@@ -74,12 +137,13 @@ public final class Vector
      * @param otherVector the Vector to add to this one.
      * @return a Vector representing the addition of the two supplied Vectors.
      */
+    @CheckResult
     @NonNull
     public Vector add(@NonNull Vector otherVector)
     {
         if (this.equals(ZERO)) return otherVector;
         if (otherVector.equals(ZERO)) return this;
-        return new Vector(x + otherVector.getX(), y + otherVector.getY());
+        return new Vector(X + otherVector.getX(), Y + otherVector.getY());
     }
 
     /**
@@ -87,11 +151,12 @@ public final class Vector
      * @param otherVector the Vector to subtract.
      * @return a Vector representing the subtraction of the other Vector from this one.
      */
+    @CheckResult
     @NonNull
     public Vector subtract(@NonNull Vector otherVector)
     {
         if (otherVector.equals(ZERO)) return this;
-        return new Vector(x - otherVector.getX(), y - otherVector.getY());
+        return new Vector(X - otherVector.getX(), Y - otherVector.getY());
     }
 
     /**
@@ -99,11 +164,12 @@ public final class Vector
      * @param factor the factor to scale by.
      * @return a new, scaled Vector.
      */
+    @CheckResult
     @NonNull
     public Vector scale(double factor)
     {
         if (factor == 1) return this;
-        return new Vector(x * factor, y * factor);
+        return new Vector(X * factor, Y * factor);
     }
 
     /**
@@ -114,7 +180,7 @@ public final class Vector
     @Contract(pure = true)
     public double dot(@NonNull Vector otherVector)
     {
-        return (x * otherVector.x) + (y * otherVector.y);
+        return (X * otherVector.X) + (Y * otherVector.Y);
     }
 
     /**
@@ -122,6 +188,7 @@ public final class Vector
      * @param target the Vector to project onto.
      * @return the Vector projection.
      */
+    @CheckResult
     @NonNull
     public Vector projectOnto(@NonNull Vector target)
     {
@@ -129,42 +196,46 @@ public final class Vector
     }
 
     /**
-     * Creates a new Vector with only the x length of this one, and y set to 0.
+     * Returns a Vector with only the X length of this one, and Y set to 0.
      * @return the horizontal Vector.
      */
+    @CheckResult
     @NonNull
     public Vector onlyX()
     {
-        if (y == 0) return this;
-        return new Vector(x, 0);
+        if (Y == 0) return this;
+        return new Vector(X, 0);
     }
 
     /**
-     * Creates a new Vector with only the y length of this one, and x set to 0.
+     * Returns a Vector with only the Y length of this one, and X set to 0.
      * @return the vertical Vector.
      */
+    @CheckResult
     @NonNull
     public Vector onlyY()
     {
-        if (x == 0) return this;
-        return new Vector(0, y);
+        if (X == 0) return this;
+        return new Vector(0, Y);
     }
 
     /**
      * Rotates this Vector by a number of radians to create a new Vector.
-     * @param radians the degree in radians to rotate by.
+     * @param deltaThetaRadians the radians to rotate by.
      * @return the rotated Vector.
      */
+    @CheckResult
     @NonNull
-    public Vector rotateBy(double radians)
+    public Vector rotateBy(double deltaThetaRadians)
     {
-        return new Vector(x * Math.cos(radians) - y * Math.sin(radians), x * Math.sin(radians) + y * Math.cos(radians));
+        return new Vector(X * Math.cos(deltaThetaRadians) - Y * Math.sin(deltaThetaRadians), X * Math.sin(deltaThetaRadians) + Y * Math.cos(deltaThetaRadians));
     }
 
     /**
      * Creates a Vector perpendicular to this one.
-     * @return the perpendicular Vector
+     * @return the perpendicular Vector.
      */
+    @CheckResult
     @NonNull
     public Vector perpendicular()
     {
@@ -172,35 +243,23 @@ public final class Vector
     }
 
     /**
-     * Get the x length of this Vector.
-     * @return the x length.
+     * Get the X length of this Vector.
+     * @return the X length.
      */
     @Contract(pure = true)
     public float getX()
     {
-        return x;
+        return X;
     }
 
     /**
-     * Get the y length of this Vector.
-     * @return the y length.
+     * Get the Y length of this Vector.
+     * @return the Y length.
      */
     @Contract(pure = true)
     public float getY()
     {
-        return y;
-    }
-
-    @NonNull
-    public static Vector fromPolarDegrees(double r, double theta)
-    {
-        return Vector.fromPolarRadians(r, Math.toRadians(theta));
-    }
-
-    @NonNull
-    public static Vector fromPolarRadians(double r, double theta)
-    {
-        return new Vector(r * Math.cos(theta), r * Math.sin(theta));
+        return Y;
     }
 
     @NonNull
@@ -209,8 +268,8 @@ public final class Vector
     public String toString()
     {
         return "Vector{" +
-                "x=" + x +
-                ", y=" + y +
+                "X=" + X +
+                ", Y=" + Y +
                 '}';
     }
 
@@ -227,15 +286,14 @@ public final class Vector
         }
 
         Vector vector = (Vector) o;
-
-        return Float.compare(vector.x, x) == 0 && Float.compare(vector.y, y) == 0;
+        return Float.compare(vector.X, X) == 0 && Float.compare(vector.Y, Y) == 0;
     }
 
     @Override
     public int hashCode()
     {
-        int result = (x != +0.0f ? Float.floatToIntBits(x) : 0);
-        result = 31 * result + (y != +0.0f ? Float.floatToIntBits(y) : 0);
+        int result = (X != +0.0f ? Float.floatToIntBits(X) : 0);
+        result = 31 * result + (Y != +0.0f ? Float.floatToIntBits(Y) : 0);
         return result;
     }
 }

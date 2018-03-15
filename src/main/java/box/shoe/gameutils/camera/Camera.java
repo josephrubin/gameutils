@@ -2,7 +2,7 @@ package box.shoe.gameutils.camera;
 
 import android.graphics.Canvas;
 
-import box.shoe.gameutils.DisplayEntity;
+import box.shoe.gameutils.Entity;
 
 /**
  * Created by Joseph on 1/1/2018.
@@ -11,17 +11,16 @@ import box.shoe.gameutils.DisplayEntity;
 public interface Camera
 {
     /**
-     * Rolls the camera by preconfiguring the supplied canvas
-     * so that draws occur through the lens of the camera.
+     * Attaches the camera by preconfiguring the supplied canvas so that renders occur through the lens of the camera.
      * @param canvas the canvas to view through the camera.
      */
-    void roll(Canvas canvas);
+    void roll(Canvas canvas); //attach?
 
     /**
-     * Returns true iff the supplied DisplayEntity's display bounds indicate that it
+     * Returns true iff the supplied Entity's display bounds indicate that it
      * is seen through this camera. Must give consistent results between calls to roll().
-     * @param displayEntity the DisplayEntity to check for visibility.
-     * @return true if displayEntity is visible, and false otherwise.
+     * @param entity the Entity to check for visibility.
+     * @return true if entity is visible, and false otherwise.
      */
-    boolean isVisible(DisplayEntity displayEntity);
+    boolean isVisible(Entity entity);
 }

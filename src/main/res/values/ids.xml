@@ -4,12 +4,17 @@
     <item name="root" type="id" />
 
     <!-- Where to place the game -->
-    <item name="gameContainer" type="id" />
+    <item name="gameScreenView" type="id" />
 
     <!-- Pause menu -->
-    <item name="pauseMenu" type="id" />
+    <item name="pauseLayout" type="id" />
 
-    <!-- Overall screens -->
-    <item name="mainScreen" type="id" />
-    <item name="gameScreen" type="id" />
+    <!-- Menu screen -->
+    <item name="menuSection" type="id" />
+
+    <!-- Game screen -->
+    <item name="gameSection" type="id" />
+
+    <!-- Stubs -->
+    <item name="menuLayoutStub" type="id" />
 </resources>

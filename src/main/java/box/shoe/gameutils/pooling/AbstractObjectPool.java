@@ -6,6 +6,7 @@ import android.support.annotation.RestrictTo;
  * Created by Joseph on 2/7/2018.
  */
 
+//TODO: contains method for references, or perhaps it should even be in the ObjectLot and chained to here.
 public abstract class AbstractObjectPool<T>
 {
     private ObjectLot objectLot;

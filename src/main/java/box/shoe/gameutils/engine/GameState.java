@@ -2,72 +2,50 @@ package box.shoe.gameutils.engine;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
-import box.shoe.gameutils.pooling.AbstractObjectPool;
-import box.shoe.gameutils.pooling.FactoryObjectPool;
+import box.shoe.gameutils.Interpolatable;
 
 /**
- * Created by Joseph on 12/31/2017.
  * The job of a GameState is two fold.
- * 1) Keep track of all data that the Engine wants to pass along to the Screen for painting.
+ * 1) Keep track of a time stamp which is used for generated an interpolation ratio for rendering.
  * 2) Keep track of all Interpolatables that exist at the update that generated this GameState
  *      so that they can be interpolated.
+ * Crucially, it is NOT a save state. A GameState is a representation of a point in time, but does not hold all
+ * game data at that point.
  */
 
-public class GameState
-{//TODO: use object lot rather than a pool, for speed?
-    //TODO: move library game states to the game engine as normal fields?
-    /*pack*/ static FactoryObjectPool<GameState> POOL = new FactoryObjectPool<>(6, new Factory());
-
+/* pack */ class GameState
+{
     // The time at which the update which generated this GameState occurred.
-    private volatile long timeStamp;
+    private long timeStamp;
 
-    // All data necessary for painting this GameState. //TODO: this may be removed if we change how we pass info from engine to screen.
-    private Map<String, Object> data;
+    // Maps each Interpolatable to the values that it wishes to interpolate.
+    private Map<Interpolatable, float[]> savedInterpValues;
 
-    // Storage of all Interpolatables along with their provided InterpolatablesCarriers.
-    // Used to interpolate values for the Interpolatables at this GameState.
-    /*pack*/ WeakHashMap<Interpolatable, InterpolatablesCarrier> interps;
-
-    /*pack*/ GameState()
+    /**
+     * Create a GameState.
+     */
+    public GameState()
     {
-        data = new HashMap<>();
-        interps = new WeakHashMap<>();
+        savedInterpValues = new HashMap<>();
     }
 
-    /*pack*/ void setTimeStamp(long timeStamp)
+    public void setTimeStamp(long timeStamp)
     {
         this.timeStamp = timeStamp;
     }
 
-    /*pack*/ long getTimeStamp()
+    public long getTimeStamp()
     {
         return timeStamp;
     }
 
-    public void put(String key, Object value)
+    public Map<Interpolatable, float[]> getSavedInterpValues()
     {
-        data.put(key, value);
+        return savedInterpValues;
     }
 
-    public <T> T get(String key)
-    {
-        return (T) data.get(key);
-    }
-
-    public void cleanup()
-    {
-        data.clear();
-
-        for (InterpolatablesCarrier interpolatablesCarrier : interps.values())
-        {
-            interpolatablesCarrier.cleanup();
-            InterpolatablesCarrier.POOL.put(interpolatablesCarrier);
-        }
-        interps.clear();
-    }
-
+    /*
     private static class Factory implements FactoryObjectPool.Factory<GameState>
     {
         @Override
@@ -76,4 +54,5 @@ public class GameState
             return new GameState();
         }
     }
+    */
 }

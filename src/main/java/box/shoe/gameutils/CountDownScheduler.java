@@ -1,21 +1,16 @@
 package box.shoe.gameutils;
 
-import android.annotation.SuppressLint;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Created by Joseph on 10/26/2017.
+ * Schedules tasks to occur at some point in the future.
+ * A Runnable will be fired after the given number of calls to tick().
  */
 
-public class TaskScheduler
+public class CountDownScheduler
 { //TODO: just have tasks be scheduled based on number of updates, and not ms. Timing based on ms was unreliable, and not super helpful.
-    // Updates per millisecond of the engine that calls tick().
-    // Used to calculate approx how many ticks for a given time.
-    private final double UPMS;
-
     // The scheduled tasks.
     private Set<Task> tasks;
 
@@ -26,25 +21,32 @@ public class TaskScheduler
     private Set<Task> tasksBuffer;
 
     /**
-     * Create a TaskScheduler.
-     * @param UPS the updates per second o the game engine that will call tick().
+     * Create a CountDownScheduler.
      */
-    public TaskScheduler(int UPS)
+    public CountDownScheduler()
     {
-        this.UPMS = UPS / 1000.0;
         tasks = new HashSet<>();
         tasksBuffer = new HashSet<>();
     }
 
-    public void schedule(int ms, int repetitions, Runnable schedulable) //0 for repetitions means eternal, ms accurate to within about 10ms if tick() is called on an AbstractEngine update
+    /**
+     * Register a Runnable to be fired after the supplied number of ticks have been counted.
+     * @param ticks the number of times tick() will be called before the Runnable fires each time.
+     * @param repetitions the number of firings of the runnable before being removed. 0 means eternal.
+     * @param runnable the Runnable to fire.
+     */
+    public void schedule(int ticks, int repetitions, Runnable runnable)
     {
         // We add new tasks to a buffer, because we won't schedule them for real until
         // we know it is safe to do so (the scheduled tasks are not being accessed some other way).
         // If we scheduled them to the real list now, then, e.g., if the firing and removal of
         // one task scheduled another while the tasks were still ticking, a CoMoEx would be thrown.
-        tasksBuffer.add(new Task((int) Math.round(UPMS * ms), repetitions, schedulable));
+        tasksBuffer.add(new Task(ticks, repetitions, runnable));
     }
 
+    /**
+     * Remove all scheduled Runnables.
+     */
     public synchronized void cancelAll()
     {
         tasks.clear();
@@ -76,9 +78,9 @@ public class TaskScheduler
         private int currentFrame;
         private int maxRepetitions;
         private int currentRepetition;
-        private Runnable schedulable;
+        private Runnable runnable;
 
-        private Task(int maxFrames, int repetitions, Runnable schedulable)
+        private Task(int maxFrames, int repetitions, Runnable runnable)
         {
             currentFrame = 0;
             this.maxFrames = maxFrames;
@@ -86,10 +88,9 @@ public class TaskScheduler
             this.maxRepetitions = repetitions;
             if (this.maxFrames == 0)
             {
-                throw new IllegalArgumentException("This event is scheduled to occur every" +
-                        "0 frames at this UPS. Events must be scheduled for the future.");
+                throw new IllegalArgumentException("This task is scheduled in 0 ticks. Events must be scheduled for the future.");
             }
-            this.schedulable = schedulable;
+            this.runnable = runnable;
         }
 
         private boolean tock() //Returns true if this event should be removed from the set (it should not repeat)
@@ -98,7 +99,7 @@ public class TaskScheduler
             if (currentFrame >= maxFrames) //If we have exhausted the delay
             {
                 currentFrame = 0;
-                schedulable.run();
+                runnable.run();
 
                 if (maxRepetitions == 0)
                     return false; //Eternally repeat
@@ -106,7 +107,7 @@ public class TaskScheduler
                 currentRepetition++;
                 if (currentRepetition >= maxRepetitions)
                 {
-                    schedulable = null;
+                    runnable = null;
                     return true; //If we have reached the desired repetitions, remove
                 }
             }
@@ -122,7 +123,7 @@ public class TaskScheduler
             if (otherObject.getClass() != getClass())
                 return false;
             Task otherTask = (Task) otherObject;
-            return maxFrames == otherTask.maxFrames && schedulable.equals(otherTask.schedulable);
+            return maxFrames == otherTask.maxFrames && runnable.equals(otherTask.runnable);
         }
     }
 }
