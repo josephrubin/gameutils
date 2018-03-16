@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * Created by Joseph on 2/13/2018.
+ * @deprecated
  */
 
 public class Scene implements Updatable, Renderable

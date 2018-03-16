@@ -13,7 +13,7 @@ public interface Camera
     /**
      * Attaches the camera by preconfiguring the supplied canvas so that renders occur through the lens of the camera.
      * @param canvas the canvas to view through the camera.
-     */
+     */ //TODO: hm, maybe camera should just return a Matrix which is more general purpose, can be applied to Canvas and probably GL too! (con: harder to generate matrix).
     void roll(Canvas canvas); //attach?
 
     /**
@@ -22,5 +22,5 @@ public interface Camera
      * @param entity the Entity to check for visibility.
      * @return true if entity is visible, and false otherwise.
      */
-    boolean isVisible(Entity entity);
+    boolean isVisible(Entity entity); //todo: inbounds and check body instead of display?
 }

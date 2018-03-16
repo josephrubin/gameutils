@@ -34,4 +34,5 @@ dependencies {
     implementation 'com.android.support:support-annotations:27.0.2'
     compile 'org.jetbrains:annotations-java5:15.0'
     //compile project(path: ':interpolation')
+    testCompile 'junit:junit:4.12'
 }

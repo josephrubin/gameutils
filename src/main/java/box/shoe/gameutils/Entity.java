@@ -123,6 +123,7 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
     @CallSuper
     public void cleanup()
     {
+        INTERPOLATABLE_SERVICE.removeMember(this);
         cleaned = true;
     }
 

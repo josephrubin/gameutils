@@ -19,6 +19,7 @@ import java.io.IOException;
 
 public class TileMapLoader
 {//TODO: we will want to add methods for parsing from some way other than an asset file path. E.G. input stream, or string.
+    public static int EMPTY_TILE = -1;
     private static java.util.Map<String, Tileset> cachedTilesets = new java.util.HashMap<>();
 
     public static TileMap fromXml(AssetManager assetManager, String xmlFilePath) throws IOException
@@ -151,8 +152,17 @@ public class TileMapLoader
                 }
                 if (tileTileset == null)
                 {
-                    throw new IllegalArgumentException("Malformed XML! Found a tile (" + tileElement + "+ whose GID" +
-                            " (" + absoluteTileGid + ") is not contained in any tileset!");
+                    if (absoluteTileGid == 0)
+                    {
+                        // No tile was placed in this position.
+                        absoluteTileGid = EMPTY_TILE;
+                        relativeTileGid = EMPTY_TILE;
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException("Malformed XML! Found a tile (" + tileElement + "+ whose GID" +
+                                " (" + absoluteTileGid + ") is not contained in any tileset!");
+                    }
                 }
                 int tileColumn = j % TILE_MAP_TILES_PER_ROW;
                 int tileRow = j / TILE_MAP_TILES_PER_ROW;

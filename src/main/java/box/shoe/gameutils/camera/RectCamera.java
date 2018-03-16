@@ -5,105 +5,46 @@ import android.graphics.RectF;
 
 import box.shoe.gameutils.AABB;
 import box.shoe.gameutils.Entity;
+import box.shoe.gameutils.Interpolatable;
 
 /**
  * Created by Joseph on 2/20/2018.
  */
-public class RectCamera implements Camera
+public class RectCamera implements Camera, Interpolatable
 {
-    private RectF visibleBounds;
-    private AABB bounds;
-    private float zoomFactor;
-    private float zoomPivotX;
-    private float zoomPivotY;
+    private RectF gamePortionBounds;
+    private AABB visibleBounds;
 
-    // When set to true, recalculateVisibleBounds will be called following a call to roll.
-    private boolean visibleBoundsDirty = true;
+    private RectF interpolatedGamePortionBounds;
+    private AABB interpolatedVisibleBounds;
 
-    /**
-     * Constructs a new rectangular implementation of Camera, with a setZoomFactor of 1 (no setZoomFactor)
-     * and the camera's bounds set to (0, 0, 0, 0).
-     * @see #setBounds(float, float, float, float)
-     * @see #setBounds(RectF)
-     */
-    public RectCamera()
+    public RectCamera(RectF gamePortionToShow, RectF fitToVisibleBounds)
     {
-        bounds = new AABB();
-        visibleBounds = new RectF();
-        bounds.set(0, 0, 0,0 );
-        zoomFactor = 1;
-        setZoomPivot(0, 0);
+        this.gamePortionBounds = new RectF(gamePortionToShow);
+        visibleBounds = new AABB(fitToVisibleBounds);
+
+        interpolatedGamePortionBounds = new RectF(this.gamePortionBounds);
+        interpolatedVisibleBounds = new AABB(visibleBounds);
+
+        INTERPOLATABLE_SERVICE.addMember(this);
+    }
+
+    public void setGamePortionToShow(RectF gamePortionToShow)
+    {
+        gamePortionBounds = new RectF(gamePortionToShow);
+    }
+
+    public void setVisibleBounds(RectF visibleBounds)
+    {
+        this.visibleBounds = new AABB(visibleBounds);
     }
 
     @Override
     public void roll(Canvas canvas)
     {
-        canvas.translate(bounds.left, bounds.top);
-        canvas.scale(zoomFactor, zoomFactor, zoomPivotX, zoomPivotY);
-        if (visibleBoundsDirty)
-        {
-            recalculateVisibleBounds();
-            visibleBoundsDirty = false;
-        }
-    }
-
-    public void setZoomPivot(float x, float y)
-    {
-        zoomPivotX = x;
-        zoomPivotY = y;
-        visibleBoundsDirty = true;
-    }
-
-    public void setZoomFactor(float zoomFactor)
-    {
-        this.zoomFactor = zoomFactor;
-        visibleBoundsDirty = true;
-    }
-
-    public float getZoomFactor()
-    {
-        return zoomFactor;
-    }
-
-    public void pan(float dx, float dy)
-    {
-        this.bounds.offset(dx, dy);
-        visibleBoundsDirty = true;
-    }
-
-    // represents visible area when setZoomFactor(1)
-    public void setBounds(RectF bounds)
-    {
-        this.bounds.set(bounds);
-        visibleBoundsDirty = true;
-    }
-
-    public void setBounds(float left, float top, float right, float bottom)
-    {
-        this.bounds.set(left, top, right, bottom);
-        visibleBoundsDirty = true;
-    }
-
-    //TODO: must be tested.
-    //TODO: must factor in the zoomPivot for this to be correct.
-    private void recalculateVisibleBounds()
-    {
-        float zoomPivotWidthProportion = (zoomPivotX - bounds.left) / bounds.width();
-        float zoomPivotHeightProportion = (zoomPivotY - bounds.top) / bounds.height();
-
-        // First set the visible bounds to the center of bounds.
-        float centerX = bounds.centerX();
-        float centerY = bounds.centerY();
-        visibleBounds.set(centerX, centerY, centerX, centerY);
-
-        // Now expand it, factoring in the setZoomFactor level.
-        float width = bounds.width() / zoomFactor;
-        float height = bounds.height() / zoomFactor;
-        visibleBounds.inset(- width / 2, - height / 2);
-
-        // Lastly, fix regarding the setZoomFactor pivot.
-        visibleBounds.offsetTo(zoomPivotX - (zoomPivotWidthProportion * visibleBounds.width()),
-                zoomPivotY - (zoomPivotHeightProportion * visibleBounds.height()));
+        canvas.scale(interpolatedVisibleBounds.width() / interpolatedGamePortionBounds.width(), interpolatedVisibleBounds.height() / interpolatedGamePortionBounds.height(),
+                interpolatedVisibleBounds.left, interpolatedVisibleBounds.top);
+        canvas.translate(interpolatedVisibleBounds.left - interpolatedGamePortionBounds.left, interpolatedVisibleBounds.top - interpolatedGamePortionBounds.top);
     }
 
     @Override
@@ -133,5 +74,39 @@ public class RectCamera implements Camera
     public boolean isPastBottom(Entity entity)
     {
         return entity.display.top > visibleBounds.bottom;
+    }
+
+    @Override
+    public int getInterpValuesArrayMaxIndex()
+    {
+        return 7;
+    }
+
+    @Override
+    public void saveInterpValues(float[] out)
+    {
+        out[0] = gamePortionBounds.left;
+        out[1] = gamePortionBounds.top;
+        out[2] = gamePortionBounds.right;
+        out[3] = gamePortionBounds.bottom;
+
+        out[4] = visibleBounds.left;
+        out[5] = visibleBounds.top;
+        out[6] = visibleBounds.right;
+        out[7] = visibleBounds.bottom;
+    }
+
+    @Override
+    public void loadInterpValues(float[] in)
+    {
+        interpolatedGamePortionBounds.left = in[0];
+        interpolatedGamePortionBounds.top = in[1];
+        interpolatedGamePortionBounds.right = in[2];
+        interpolatedGamePortionBounds.bottom = in[3];
+
+        interpolatedVisibleBounds.left = in[4];
+        interpolatedVisibleBounds.top = in[5];
+        interpolatedVisibleBounds.right = in[6];
+        interpolatedVisibleBounds.bottom = in[7];
     }
 }

@@ -56,7 +56,7 @@ public class TileMap
             LAYER_MAP.put(layer.NAME, layer);
         }
     }
-    //fixme: i believe this will fail on a layer with missing tiles
+
     public Bitmap generateLayerBitmap(String layerName)
     {
         Layer layer = getLayer(layerName);
@@ -80,6 +80,12 @@ public class TileMap
             {
                 int relativeTileGid = layerRelativeTileGidGrid[i][j];
                 int absoluteTileGid = layerAbsoluteTileGidGrid[i][j];
+
+                if (absoluteTileGid == TileMapLoader.EMPTY_TILE)
+                {
+                    // Skip empty tiles.
+                    continue;
+                }
 
                 // We want to get the Tileset our tile, so search the tilesets backwards.
                 Tileset tileTileset = null;
