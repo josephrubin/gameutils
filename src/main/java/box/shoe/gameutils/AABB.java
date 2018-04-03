@@ -12,9 +12,9 @@ import android.graphics.RectF;
 
 public class AABB extends RectF
 {
-    // >> Add some new methods.
+    // ___________
+    // COLLISIONS.
 
-    // > Collisions.
     /**
      * Returns true if this AABB intersects the specified AABB.
      * In no event is this AABB modified. No check is performed to see
@@ -31,7 +31,41 @@ public class AABB extends RectF
                 && this.top < other.bottom && other.top < this.bottom;
     }
 
-    // > Offsets
+    public boolean touches(RectF other)
+    {
+        return
+                bottomTouchesTopOf(other)
+                || topTouchesBottomOf(other)
+                || rightTouchesLeftOf(other)
+                || leftTouchesRightOf(other);
+    }
+
+    public boolean bottomTouchesTopOf(RectF other)
+    {
+        return this.left < other.right && other.left < this.right
+                && (other.top == this.bottom);
+    }
+
+    public boolean topTouchesBottomOf(RectF other)
+    {
+        return this.left < other.right && other.left < this.right
+                && (other.bottom == this.top);
+    }
+
+    public boolean leftTouchesRightOf(RectF other)
+    {
+        return this.top < other.bottom && other.top < this.bottom
+                && (other.right == this.left);
+    }
+
+    public boolean rightTouchesLeftOf(RectF other)
+    {
+        return this.top < other.bottom && other.top < this.bottom
+                && (other.left == this.right);
+    }
+
+    // ________
+    // OFFSETS.
 
     /**
      * Offset to a specific (top) position,

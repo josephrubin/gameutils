@@ -510,8 +510,8 @@ public class Engine //TODO: redo input system. make it easy, usable.
                     if (BuildConfig.DEBUG)
                     {
                         Log.i(Engine.this.getClass().getSimpleName(),
-                                "We took too long to generate this past frame, so we will skip the next one to" +
-                                        "ease up on the load and avoid jank. If this is happening a lot, your drawing" +
+                                "We took too long to generate this past frame, so we will skip the next one to " +
+                                        "ease up on the load and avoid jank. If this is happening a lot, your drawing " +
                                         "routine may be doing too much work!");
                     }
                 }

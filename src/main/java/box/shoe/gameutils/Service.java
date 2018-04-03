@@ -21,7 +21,7 @@ public class Service<I>
     {
         if (!members.remove(implementor))
         {
-            throw new IllegalStateException("Supplied object does not have the service " + getClass().getName() + " to remove!");
+            throw new IllegalStateException("Supplied object does not have the service to remove!");
         }
     }
 

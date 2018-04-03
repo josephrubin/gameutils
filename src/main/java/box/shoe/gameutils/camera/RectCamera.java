@@ -1,6 +1,7 @@
 package box.shoe.gameutils.camera;
 
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.graphics.RectF;
 
 import box.shoe.gameutils.AABB;
@@ -18,7 +19,7 @@ public class RectCamera implements Camera, Interpolatable
     private RectF interpolatedGamePortionBounds;
     private AABB interpolatedVisibleBounds;
 
-    public RectCamera(RectF gamePortionToShow, RectF fitToVisibleBounds)
+    public RectCamera(RectF gamePortionToShow, Rect fitToVisibleBounds)
     {
         this.gamePortionBounds = new RectF(gamePortionToShow);
         visibleBounds = new AABB(fitToVisibleBounds);
@@ -42,9 +43,11 @@ public class RectCamera implements Camera, Interpolatable
     @Override
     public void roll(Canvas canvas)
     {
-        canvas.scale(interpolatedVisibleBounds.width() / interpolatedGamePortionBounds.width(), interpolatedVisibleBounds.height() / interpolatedGamePortionBounds.height(),
-                interpolatedVisibleBounds.left, interpolatedVisibleBounds.top);
-        canvas.translate(interpolatedVisibleBounds.left - interpolatedGamePortionBounds.left, interpolatedVisibleBounds.top - interpolatedGamePortionBounds.top);
+        float scaledWidth = interpolatedVisibleBounds.width() / interpolatedGamePortionBounds.width();
+        float scaledHeight = interpolatedVisibleBounds.height() / interpolatedGamePortionBounds.height();
+        canvas.scale(scaledWidth, scaledHeight, interpolatedVisibleBounds.left, interpolatedVisibleBounds.top);
+        canvas.translate(interpolatedVisibleBounds.left - interpolatedGamePortionBounds.left,
+                interpolatedVisibleBounds.top - interpolatedGamePortionBounds.top);
     }
 
     @Override

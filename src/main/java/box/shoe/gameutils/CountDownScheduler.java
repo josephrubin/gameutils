@@ -9,7 +9,7 @@ import java.util.Set;
  * A Runnable will be fired after the given number of calls to tick().
  */
 
-public class CountDownScheduler
+public class CountDownScheduler implements Updatable
 { //TODO: just have tasks be scheduled based on number of updates, and not ms. Timing based on ms was unreliable, and not super helpful.
     // The scheduled tasks.
     private Set<Task> tasks;
@@ -53,7 +53,8 @@ public class CountDownScheduler
         tasksBuffer.clear();
     }
 
-    public synchronized void tick()
+    @Override
+    public synchronized void update()
     {
         // Now we can safely schedule the tasks from the buffer.
         tasks.addAll(tasksBuffer);

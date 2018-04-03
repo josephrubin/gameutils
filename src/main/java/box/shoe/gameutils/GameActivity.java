@@ -61,6 +61,7 @@ public abstract class GameActivity extends Activity
         pauseLayoutView = findViewById(R.id.pauseLayout);
     }
 
+    // When we are visually obstructed, simply pause if the game is playing.
     @Override
     protected void onPause()
     {
@@ -188,10 +189,11 @@ public abstract class GameActivity extends Activity
     @LayoutRes
     protected int provideMainMenuLayoutResource()
     {
-        return R.layout.default_main_menu_layout; //todo: the default layout should reccomend overriding this method.
+        return R.layout.default_main_menu_layout; //todo: the default layout should recommend overriding this method.
     }
 
-    // By default, we provide a SurfaceViewScreen (recommended). The subclass activity is free to supply a different type by overriding.
+    // By default, we provide a SurfaceViewScreen (recommended).
+    // The subclass activity is free to supply a different type by overriding.
     @NonNull
     protected Screen provideNewScreen(Context context)
     {
@@ -237,8 +239,8 @@ public abstract class GameActivity extends Activity
         }
     }
 
-    // When we lose focus, pause the game,
-    // and when we gain focus, resume the game.
+    // When we lose focus, pause the game.
+    // When we gain focus, resume the game.
     // If we are not in game, do nothing.
     @Override
     public void onWindowFocusChanged(boolean hasFocus)

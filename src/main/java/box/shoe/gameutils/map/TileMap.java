@@ -127,6 +127,10 @@ public class TileMap
 
     private Layer getLayer(String layerName)
     {
+        if (!LAYER_MAP.containsKey(layerName))
+        {
+            throw new IllegalArgumentException("TileMap does not contain a layer '" + layerName + "'!");
+        }
         return LAYER_MAP.get(layerName);
     }
 

@@ -1,5 +1,6 @@
 package box.shoe.gameutils;
 
+import android.graphics.PointF;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 
@@ -7,7 +8,7 @@ import org.jetbrains.annotations.Contract;
 
 /**
  * Created by Joseph on 10/21/2017.
- * A magnitude and a direction in 2D space.
+ * A getMagnitude and a direction in 2D space.
  * This class is IMMUTABLE, so remember to use method return values (the original Vectors will not change).
  * Any method which returns a Vector need not create a new one. If possible, it is able to return one
  * of the arguments itself (e.g. onlyX returns the argument if the argument already has Y == 0).
@@ -86,7 +87,7 @@ public final class Vector //TODO: could change to double precision and cast to f
      * Constructs a Vector from polar coordinate values.
      * @param magnitude the length
      * @param thetaRadians the angle in radians
-     * @return a Vector from the specified magnitude and theta from the origin after converting to X, Y values (atCCW from +x).
+     * @return a Vector from the specified getMagnitude and theta from the origin after converting to X, Y values (atCCW from +x).
      */
     @NonNull
     public static Vector fromPolar(float magnitude, float thetaRadians)
@@ -98,7 +99,7 @@ public final class Vector //TODO: could change to double precision and cast to f
      * Constructs a Vector from polar coordinate values.
      * @param magnitude the length (will be casted to float)
      * @param thetaRadians the angle in radians (will be casted to float)
-     * @return a Vector from the specified magnitude and theta from the origin (CCW from +x).
+     * @return a Vector from the specified getMagnitude and theta from the origin (CCW from +x).
      */
     @NonNull
     public static Vector fromPolar(double magnitude, double thetaRadians)
@@ -107,27 +108,46 @@ public final class Vector //TODO: could change to double precision and cast to f
     }
 
     /**
-     * Calculates the magnitude (length) of this Vector
-     * @return the Vector's magnitude
+     * Construct a Vector from one PointF to another PointF.
+     * @param from the starting PointF.
+     * @param to the ending PointF.
+     * @return a Vector from the first PointF to the second PointF.
      */
-    public double magnitude()
+    @NonNull
+    public static Vector to(PointF from, PointF to)
+    {
+        return Vector.fromCartesian(to.x - from.x, to.y - from.y);
+    }
+
+    /**
+     * Calculates the getMagnitude (length) of this Vector
+     * @return the Vector's getMagnitude
+     */
+    public double getMagnitude()
     {
         // Equivalent of Math.sqrt(this.dot(this))
         return Math.sqrt((X * X) + (Y * Y));
     }
 
+    public double getTheta()
+    {
+        return Math.atan2(Y, X);
+    }
+
+
     /**
-     * Constructs a Vector in the same direction as this one, but with a magnitude of 1.
+     * Constructs a Vector in the same direction as this one, but with a getMagnitude of 1.
      * @return this Vector's unit Vector.
      */
     @CheckResult
     @NonNull
     public Vector unit()
     {
-        double magnitude = magnitude();
+        double magnitude = getMagnitude();
+        // Since we cannot scale by 1/0 we must throw an exception when this.equals(Vector.ZERO).
         if (magnitude == 0)
         {
-            throw new ArithmeticException("Vector magnitude is 0. Cannot create unit vector.");
+            throw new ArithmeticException("Vector getMagnitude is 0. Cannot create unit vector.");
         }
         return this.scale(1 / magnitude);
     }
@@ -160,7 +180,7 @@ public final class Vector //TODO: could change to double precision and cast to f
     }
 
     /**
-     * Scales this vector's magnitude by a factor.
+     * Scales this vector's getMagnitude by a factor.
      * @param factor the factor to scale by.
      * @return a new, scaled Vector.
      */

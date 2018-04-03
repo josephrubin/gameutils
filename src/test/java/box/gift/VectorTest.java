@@ -50,7 +50,7 @@ public class VectorTest
     public void magnitude()
     {
         Vector test = Vector.fromCartesian(3, 4);
-        assertEquals("Magnitude calculates correctly", (int) test.magnitude(), 5);
+        assertEquals("Magnitude calculates correctly", (int) test.getMagnitude(), 5);
     }
 
     @Test

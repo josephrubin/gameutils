@@ -1,7 +1,12 @@
 package box.shoe.gameutils;
 
+import android.graphics.RectF;
 import android.support.annotation.CallSuper;
+import android.support.annotation.RestrictTo;
 import android.util.Log;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 import box.gift.gameutils.BuildConfig;
 
@@ -23,71 +28,55 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
     // Vector which represents how many x and y units the velocity will change by per update.
     public Vector acceleration;
 
+    // Entities can have children, who stick to their parent.
+    private Collection<Entity> children;
+
     // Enforce cleanup method call.
     private boolean cleaned = false;
 
-    /**
-     * Creates an Entity with the specified x and y coordinates,
-     * with no width or height, with no velocity or acceleration.
-     * @param initialX the starting x coordinate.
-     * @param initialY the starting y coordinate.
-     */
-    public Entity(float initialX, float initialY) //TODO: version of these with RectF's? Or at least with params in the form of left/top/right/bot?
+    public Entity(RectF body)
     {
-        this(initialX, initialY, 0, 0, Vector.ZERO, Vector.ZERO);
+        this(body, Vector.ZERO, Vector.ZERO);
+    }
+
+    public Entity(RectF body, Vector initialVelocity)
+    {
+        this(body, initialVelocity, Vector.ZERO);
     }
 
     /**
-     * Creates an Entity with the specified x and y coordinates,
-     * width and height, with no velocity or acceleration.
-     * @param initialX the starting x coordinate.
-     * @param initialY the starting y coordinate.
-     * @param initialWidth the starting width.
-     * @param initialHeight the starting height.
-     */
-    public Entity(float initialX, float initialY, float initialWidth, float initialHeight)
-    {
-        this(initialX, initialY, initialWidth, initialHeight, Vector.ZERO, Vector.ZERO);
-    }
-
-    /**
-     * Creates an Entity with the specified x and y coordinates and velocity, with no acceleration.
-     * @param initialX the starting x coordinate.
-     * @param initialY the starting y coordinate.
-     * @param initialWidth the starting width.
-     * @param initialHeight the starting height.
-     * @param initialVelocity the starting velocity.
-     */
-    public Entity(float initialX, float initialY, float initialWidth, float initialHeight, Vector initialVelocity)
-    {
-        this(initialX, initialY, initialWidth, initialHeight, initialVelocity, Vector.ZERO);
-    }
-
-    /**
-     * Creates an Entity with the specified x and y coordinates, velocity and acceleration.
-     * @param initialX the starting x coordinate.
-     * @param initialY the starting y coordinate.
-     * @param initialWidth the starting width.
-     * @param initialHeight the starting height.
+     * Creates an Entity with ....
+     * //todo: complete
      * @param initialVelocity the starting velocity.
      * @param initialAcceleration the starting acceleration.
      */
-    public Entity(float initialX, float initialY, float initialWidth, float initialHeight, Vector initialVelocity, Vector initialAcceleration)
+    public Entity(RectF body, Vector initialVelocity, Vector initialAcceleration)
     {
-        // Do some sanity checking.... removing these checks could potentially be interesting,
+        // Do some dimension checks. Removing these checks could potentially be interesting,
         // but would probably not lead to behavior that is intended most of the time.
-        if (initialWidth < 0)
+        if (body.width() < 0)
         {
-            throw new IllegalArgumentException("Width cannot be less than 0: " + initialWidth);
+            throw new IllegalArgumentException("Width cannot be less than 0: " + body.width());
         }
-        if (initialHeight < 0)
+        if (body.height() < 0)
         {
-            throw new IllegalArgumentException("Height cannot be less than 0: " + initialHeight);
+            throw new IllegalArgumentException("Height cannot be less than 0: " + body.height());
         }
-        body = new AABB(initialX, initialY, initialX + initialWidth, initialY + initialHeight);
+        this.body = new AABB(body);
         display = new AABB(body);
         velocity = initialVelocity;
         acceleration = initialAcceleration;
+        children = new HashSet<>();
+    }
+
+    public void addChild(Entity child)
+    {
+        children.add(child);
+    }
+
+    public void removeChild(Entity child)
+    {
+        children.remove(child);
     }
 
     /**
@@ -100,17 +89,59 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
     @CallSuper
     public void update()
     {
+        float saveCenterX = body.centerX();
+        float saveCenterY = body.centerY();
+
         // We will update velocity based on acceleration first,
         // and update position based on velocity second.
         // This is apparently called Semi-Implicit Euler and is a more accurate form of integration
         // when acceleration is not constant.
 
+        // By default, acceleration is preserved through updates, but subclasses can change this behavior,
+        // as can external code (acceleration is settable, after all).
+
         // Update velocity first based on current acceleration.
-        velocity = velocity.add(acceleration);
+        updateVelocity();
 
         // Update position based on new velocity.
+        updatePosition();
+
+        // We do not update all children, but we do offset them by the amount of their parent.
+        for (Entity child : children)
+        {
+            child.body.offset(body.centerX() - saveCenterX, body.centerY() - saveCenterY);
+        }
+    }
+
+    /**
+     * We define update() in terms of smaller functions so that subclasses have more customization options.
+     * The purpose of this function is to update this Entity's velocity.
+     * The default implementation is to add acceleration.
+     */
+    @RestrictTo(RestrictTo.Scope.SUBCLASSES)
+    @CallSuper
+    protected void updateVelocity()
+    {
+        velocity = velocity.add(acceleration);
+    }
+
+    /**
+     * We define update() in terms of smaller functions so that subclasses have more customization options.
+     * The purpose of this function is to update this Entity's position.
+     * The default implementation is to offset by velocity.
+     */
+    @RestrictTo(RestrictTo.Scope.SUBCLASSES)
+    @CallSuper
+    protected void updatePosition()
+    {
         body.offset(velocity.getX(), velocity.getY());
     }
+
+    public Vector vectorTo(Entity other)
+    {
+        return Vector.fromCartesian(other.body.centerX() - body.centerX(), other.body.centerY() - body.centerY());
+    }
+
 
     /**
      * Cleanup should always be called before an Entity is eligible to be Garbage Collected.
@@ -123,7 +154,10 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
     @CallSuper
     public void cleanup()
     {
-        INTERPOLATABLE_SERVICE.removeMember(this);
+        if (INTERPOLATABLE_SERVICE.hasMember(this))
+        {
+            INTERPOLATABLE_SERVICE.removeMember(this);
+        }
         cleaned = true;
     }
 
