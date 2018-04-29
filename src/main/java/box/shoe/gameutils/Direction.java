@@ -5,23 +5,16 @@ import java.util.Map;
 //TODO: both ordinal and cardinal directions, and fromTheta should more accurately say what it does (closest existing Direction)
 public class Direction
 {
-    public static final Direction WEST = new Direction();
-    public static final Direction NORTH = new Direction();
-    public static final Direction EAST = new Direction();
-    public static final Direction SOUTH = new Direction();
+    public static final Direction WEST = new Direction(Vector.WEST);
+    public static final Direction NORTH = new Direction(Vector.NORTH);
+    public static final Direction EAST = new Direction(Vector.EAST);
+    public static final Direction SOUTH = new Direction(Vector.SOUTH);
 
-    private static final Map<Direction, Vector> DIRECTION_TO_VECTOR = new HashMap<>(4);
-    static
-    {
-        DIRECTION_TO_VECTOR.put(WEST, Vector.WEST);
-        DIRECTION_TO_VECTOR.put(NORTH, Vector.NORTH);
-        DIRECTION_TO_VECTOR.put(EAST, Vector.EAST);
-        DIRECTION_TO_VECTOR.put(SOUTH, Vector.SOUTH);
-    }
+    public final Vector VECTOR;
 
-    public Vector toVector()
+    private Direction(Vector pointingVector)
     {
-        return DIRECTION_TO_VECTOR.get(this);
+        VECTOR = pointingVector;
     }
 
     //TODO: from Vector, not from Theta
