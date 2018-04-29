@@ -67,6 +67,11 @@ public class AABB extends RectF
     // ________
     // OFFSETS.
 
+    public void offset(Vector offsetVector)
+    {
+        offset(offsetVector.getX(), offsetVector.getY());
+    }
+
     /**
      * Offset to a specific (top) position,
      * keeping width and height the same.

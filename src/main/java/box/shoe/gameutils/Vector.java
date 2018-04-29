@@ -123,10 +123,10 @@ public final class Vector //TODO: could change to double precision and cast to f
      * Calculates the getMagnitude (length) of this Vector
      * @return the Vector's getMagnitude
      */
-    public double getMagnitude()
+    public float getMagnitude()
     {
         // Equivalent of Math.sqrt(this.dot(this))
-        return Math.sqrt((X * X) + (Y * Y));
+        return (float) Math.sqrt((X * X) + (Y * Y));
     }
 
     public double getTheta()

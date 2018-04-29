@@ -48,7 +48,7 @@ public class ObjectLot //TODO: if object is sleeping, the GameState weak refs sh
         }
         if (isFull())
         {
-            throw new IllegalStateException("Pool is full!");
+            throw new IllegalStateException("Lot is full!");
         }
         currentIndex++;
         sleeping[currentIndex] = obj;

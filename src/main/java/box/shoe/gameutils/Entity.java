@@ -2,6 +2,7 @@ package box.shoe.gameutils;
 
 import android.graphics.RectF;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.util.Log;
 
@@ -137,7 +138,7 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
         body.offset(velocity.getX(), velocity.getY());
     }
 
-    public Vector vectorTo(Entity other)
+    public Vector vectorTo(@NonNull Entity other)
     {
         return Vector.fromCartesian(other.body.centerX() - body.centerX(), other.body.centerY() - body.centerY());
     }

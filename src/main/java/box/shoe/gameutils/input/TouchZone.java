@@ -1,12 +1,14 @@
 package box.shoe.gameutils.input;
 
 import android.graphics.RectF;
+import android.support.annotation.CallSuper;
+import android.support.annotation.RestrictTo;
 import android.view.MotionEvent;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+
+import static android.view.View.NO_ID;
 
 /**
  * Created by Joseph on 3/16/2018.
@@ -14,25 +16,34 @@ import java.util.Set;
  * All touch related MotionEvents must be passed via processTouch(MotionEvent) in order for it to work.
  */
 
-public class TouchArea implements Touchable
+public class TouchZone implements Touchable
 {
-    // The zone of the screen where this TouchArea is.
-    protected RectF bounds;
+    // The zone of the screen where this TouchZone is.
+    private RectF bounds;
 
     private boolean isCircle;
 
-    private List<Integer> activePointerIds;
+    private ExclusivePointerMode exclusivePointerMode;
 
-    public TouchArea(RectF bounds)
+    private List<Integer> activePointerIds;
+    private int exclusiveActivePointerId;
+
+    public TouchZone(RectF bounds)
     {
-        this(bounds, false);
+        this(bounds, false, ExclusivePointerMode.FIRST);
     }
 
-    public TouchArea(RectF bounds, boolean isCircle)
+    public TouchZone(RectF bounds, boolean isCircle)
     {
+        this(bounds, isCircle, ExclusivePointerMode.FIRST);
+    }
+
+    public TouchZone(RectF bounds, boolean isCircle, ExclusivePointerMode exclusivePointerMode)
+    {
+        this.bounds = bounds;
         this.isCircle = isCircle;
-        this.bounds = new RectF(bounds);
         activePointerIds = new LinkedList<>();
+        this.exclusivePointerMode = exclusivePointerMode;
     }
 
     public boolean isActive()
@@ -40,20 +51,21 @@ public class TouchArea implements Touchable
         return !activePointerIds.isEmpty();
     }
 
-    public List<Integer> getActivePointerIds()
+    public boolean isActivePointerId(int id)
     {
-        return activePointerIds;
+        return activePointerIds.contains(id);
     }
 
-    public RectF getBounds()
+    public int getExclusiveActivePointerId()
     {
-        return new RectF(bounds);
+        return exclusiveActivePointerId;
     }
 
     public void processTouch(MotionEvent motionEvent)
     {
         // We are not touched unless we find a pointer within our area.
         activePointerIds.clear();
+        exclusiveActivePointerId = NO_ID;
 
         int action = motionEvent.getActionMasked();
         int index = motionEvent.getActionIndex();
@@ -69,13 +81,31 @@ public class TouchArea implements Touchable
                 if (i != index ||
                         TouchConstants.DOWN_ACTIONS.contains(action) || TouchConstants.MOVE_ACTIONS.contains(action))
                 {
-                    activePointerIds.add(motionEvent.getPointerId(i));
+                    addActivePointerId(motionEvent.getPointerId(i));
                 }
             }
         }
     }
 
-    private boolean withinBounds(float x, float y)
+    @CallSuper
+    @RestrictTo(RestrictTo.Scope.SUBCLASSES)
+    protected void addActivePointerId(int id)
+    {
+        if (exclusivePointerMode.equals(ExclusivePointerMode.FIRST))
+        {
+            if (activePointerIds.isEmpty())
+            {
+                exclusiveActivePointerId = id;
+            }
+        }
+        else if (exclusivePointerMode.equals(ExclusivePointerMode.LAST))
+        {
+            exclusiveActivePointerId = id;
+        }
+        activePointerIds.add(id);
+    }
+
+    protected boolean withinBounds(float x, float y)
     {
         if (isCircle)
         {
@@ -104,5 +134,17 @@ public class TouchArea implements Touchable
             return distanceSquared < radiusSquared;
         }
         return false;
+    }
+
+    @RestrictTo(RestrictTo.Scope.SUBCLASSES)
+    protected RectF getBounds()
+    {
+        return new RectF(bounds);
+    }
+
+    public static class ExclusivePointerMode
+    {
+        public static final ExclusivePointerMode FIRST = new ExclusivePointerMode();
+        public static final ExclusivePointerMode LAST = new ExclusivePointerMode();
     }
 }

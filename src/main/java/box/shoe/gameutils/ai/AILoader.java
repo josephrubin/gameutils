@@ -190,11 +190,11 @@ public class AILoader
         }
         catch (NoSuchMethodException e)
         {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Class (" + stripWhiteSpace(text) + ") has no default constructor!");
         }
         catch (ClassNotFoundException e)
         {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Class (" + stripWhiteSpace(text) + ") not found!");
         }
         return object;
     }

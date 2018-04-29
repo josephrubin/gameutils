@@ -1,14 +1,18 @@
 package box.shoe.gameutils.ai;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayDeque;
 
+import box.shoe.gameutils.Entity;
 import box.shoe.gameutils.Updatable;
-
+//TODO: should AI by default not have control() and behaviors not take an Entity and define EntityAI as we did with EnemyAI?
 public class AI implements Updatable
 {
     private final Clause[] CLAUSES;
     private ArrayDeque<Behavior> stack;
     private boolean justSwitched;
+    private Entity controlled;
 
     public AI(Behavior startingBehavior, Clause[] clauses)
     {
@@ -21,19 +25,29 @@ public class AI implements Updatable
         justSwitched = true;
     }
 
+    public void control(@NonNull Entity entity)
+    {
+        controlled = entity;
+    }
+
     @Override
     public void update()
     {
+        if (controlled == null)
+        {
+            throw new IllegalStateException("AI does not know what to control! Please call control(Entity) before updating.");
+        }
+
         Behavior currentBehavior = stack.peek();
 
         if (justSwitched)
         {
-            currentBehavior.enter();
+            currentBehavior.enter(controlled);
             justSwitched = false;
         }
 
         // Run the current Behavior at least once before checking the change conditions.
-        currentBehavior.behave();
+        currentBehavior.behave(controlled);
         // Every update we see if any of the Predicates should be triggered to change the current Behavior.
         // Find what Clause we are in.
         for (Clause clause : CLAUSES)
@@ -48,11 +62,11 @@ public class AI implements Updatable
                     for (Predicate predicate : clause.PREDICATES)
                     {
                         // See if the Predicate's Condition is true.
-                        if (predicate.CONDITION.check())
+                        if (predicate.CONDITION.check(controlled))
                         {
                             // Run the Predicate's Result, and then break.
                             // Only the first Predicate whose Condition is true is activated.
-                            currentBehavior.exit();
+                            currentBehavior.exit(controlled);
                             predicate.RESULT.resolve(stack);
                             justSwitched = true;
                             return;
