@@ -6,7 +6,7 @@ import android.view.MotionEvent;
 import box.shoe.gameutils.AABB;
 import box.shoe.gameutils.Vector;
 
-public class JoystickZone implements Touchable
+public class JoystickZone implements VectorTouchable
 {
     private TouchZone touchZone;
 
@@ -33,8 +33,8 @@ public class JoystickZone implements Touchable
             if (TouchConstants.DOWN_ACTIONS.contains(motionEvent.getActionMasked()))
             {
                 currentJoystickBounds = new AABB(0, 0, joystickWidth, joystickHeight);
-                currentJoystickBounds.offsetCenterTo(motionEvent.getX(), motionEvent.getY());
-                currentJoystick = new Joystick(currentJoystickBounds);
+                currentJoystickBounds.offsetCenterTo(motionEvent.getX(motionEvent.getActionIndex()), motionEvent.getY(motionEvent.getActionIndex()));
+                currentJoystick = new Joystick(currentJoystickBounds, motionEvent.getPointerId(motionEvent.getActionIndex()));
             }
         }
 
@@ -48,8 +48,8 @@ public class JoystickZone implements Touchable
             }
             else
             {
-                // If our joystick is no longer active, reset it to null. Once it is gone, a new one will be created
-                // on the next touch down.
+                // If our joystick is no longer active, reset it to null.
+                // Once it is gone, a new one will be created on the next touch down.
                 currentJoystick = null;
             }
         }
@@ -65,6 +65,7 @@ public class JoystickZone implements Touchable
         return currentJoystickBounds;
     }
 
+    @Override
     public Vector getActiveTouchVector()
     {
         if (!isActive())

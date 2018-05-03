@@ -37,7 +37,7 @@ public class ObjectLot //TODO: if object is sleeping, the GameState weak refs sh
 
     /**
      * Adds an object to the pool.
-     * (Precondition: the object is not already in the pool. This is not checked. Unknown behavior may follow if this condition is not fulfilled.)
+     * (Precondition: the object is not already in the pool. This is not checked. Unknown behavior may target if this condition is not fulfilled.)
      * @param obj the object to throw back into the pool.
      */
     public void give(Object obj)

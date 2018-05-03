@@ -12,7 +12,7 @@ import static android.view.View.NO_ID;
  * Created by Joseph on 3/25/2018.
  */
 
-public class Joystick implements Touchable
+public class Joystick implements VectorTouchable
 {
     private int exclusiveActivePointerId;
 
@@ -21,14 +21,33 @@ public class Joystick implements Touchable
     private RectF touchZoneBounds;
     private TouchZone touchZone;
 
+    private boolean considerSpecificPointerId;
+    private int specificPointerIdInteractable;
+
     public Joystick(RectF bounds)
     {
         exclusiveActivePointerId = NO_ID;
         this.touchZoneBounds = bounds;
+        considerSpecificPointerId = false;
+        touchZone = new TouchZone(bounds, true);
+    }
+
+    /*
+        Create a joystick only allowing one pointer id to interact with it.
+        Note that when pointers go p they lose their id's so this is best for a temporary joystick,
+        such as one created by a JoystickZone.
+     */
+    public Joystick(RectF bounds, int specificPointerIdInteractable)
+    {
+        exclusiveActivePointerId = NO_ID;
+        this.touchZoneBounds = bounds;
+        considerSpecificPointerId = true;
+        this.specificPointerIdInteractable = specificPointerIdInteractable;
         touchZone = new TouchZone(bounds, true);
     }
 
     // throw out all Vectors with getMagnitude > 1 for circular joystick.
+    @Override
     public Vector getActiveTouchVector()
     {
         if (!isActive())
@@ -60,7 +79,21 @@ public class Joystick implements Touchable
         if (!exclusiveActivePointerIdExists)
         {
             // We need a new exclusiveActivePointerId, or NO_ID.
-            exclusiveActivePointerId = touchZone.getExclusiveActivePointerId();
+            if (considerSpecificPointerId)
+            {
+                if (touchZone.isActivePointerId(specificPointerIdInteractable))
+                {
+                    exclusiveActivePointerId = specificPointerIdInteractable;
+                }
+                else
+                {
+                    exclusiveActivePointerId = NO_ID;
+                }
+            }
+            else
+            {
+                exclusiveActivePointerId = touchZone.getExclusiveActivePointerId();
+            }
         }
 
         // Whenever we are active we make an active touch Vector.

@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +25,9 @@ public class TileMap
     // Total height in pixels of this map. Equivalent to TILES_PER_COLUMN * TILE_HEIGHT_PX.
     public final int TOTAL_HEIGHT_PX;
 
+    // Custom map properties.
+    private final Map<String, String> CUSTOM_PROPERTIES;
+
     // Only the Tilesets that tiles from any Layer in this TileMap come from.
     private final Tileset[] TILESETS;
     // All of the Layers in this TileMap, accessed by their name.
@@ -36,7 +40,8 @@ public class TileMap
      * @param tileWidthPx width of each tile in pixels.
      * @param tileHeightPx height of each tile in pixels.
      */
-    /* pack */ TileMap(int tilesPerRow, int tilesPerColumn, int tileWidthPx, int tileHeightPx, Tileset[] tilesets, Layer[] layers)
+    /* pack */ TileMap(int tilesPerRow, int tilesPerColumn, int tileWidthPx, int tileHeightPx,
+                       Map<String, String> customProperties, Tileset[] tilesets, Layer[] layers)
     {
         TILES_PER_ROW = tilesPerRow;
         TILES_PER_COLUMN = tilesPerColumn;
@@ -47,6 +52,8 @@ public class TileMap
         TOTAL_WIDTH_PX = tilesPerRow * tileWidthPx;
         TOTAL_HEIGHT_PX = tilesPerColumn * tileHeightPx;
 
+        CUSTOM_PROPERTIES = customProperties;
+
         TILESETS = tilesets;
 
         LAYER_MAP = new HashMap<>();
@@ -55,6 +62,21 @@ public class TileMap
             Layer layer = layers[i];
             LAYER_MAP.put(layer.NAME, layer);
         }
+    }
+
+    public boolean hasProperty(String propertyName)
+    {
+        return CUSTOM_PROPERTIES.containsKey(propertyName);
+    }
+
+    public String getProperty(String propertyName)
+    {
+        if (!CUSTOM_PROPERTIES.containsKey(propertyName))
+        {
+            throw new IllegalArgumentException("No custom property named " + propertyName + ". " +
+                    "Please use hasProperty(propertyName) to check if the property exists.");
+        }
+        return CUSTOM_PROPERTIES.get(propertyName);
     }
 
     public Bitmap generateLayerBitmap(String layerName)

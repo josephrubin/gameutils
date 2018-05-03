@@ -16,6 +16,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import box.shoe.gameutils.CollectionUtils;
 
 public class TileMapLoader
 {//TODO: we will want to add methods for parsing from some way other than an asset file path. E.G. input stream, or string.
@@ -60,10 +65,36 @@ public class TileMapLoader
         final int TILE_MAP_TILE_WIDTH_PX = Integer.parseInt(mapElement.getAttribute("tilewidth"));
         final int TILE_MAP_TILE_HEIGHT_PX = Integer.parseInt(mapElement.getAttribute("tileheight"));
 
+        // Retrieve the 'map's custom properties.
+        Map<String, String> customProperties = Collections.emptyMap();
+        NodeList propertiesNodeList = mapElement.getElementsByTagName("properties");
+        // There should be either 0 'properties' Elements (no custom properties)
+        // or 1 'properties' elements (which contains some number > 0 of custom properties).
+        if (propertiesNodeList.getLength() > 0)
+        {
+            Element propertiesElement = (Element) propertiesNodeList.item(0);
+            NodeList propertyNodeList = propertiesElement.getElementsByTagName("property");
+            int propertyNodeListLength = propertyNodeList.getLength();
+            customProperties = new HashMap<>(propertyNodeListLength);
+            for (int i = 0; i < propertyNodeListLength; i++)
+            {
+                Element propertyElement = (Element) propertyNodeList.item(i);
+                customProperties.put(propertyElement.getAttribute("name"), propertyElement.getAttribute("value"));
+            }
+        }
+
         // Get all of the 'tileset' elements.
         NodeList tilesetNodeList = mapElement.getElementsByTagName("tileset");
         int tilesetNodeListLength = tilesetNodeList.getLength();
 
+        // We will use the source to find each tileset, and load them with the following options.
+        BitmapFactory.Options tilesetLoadOptions = new BitmapFactory.Options();
+        // We want immutable tilesets because they represent data that does not change.
+        tilesetLoadOptions.inMutable = false;
+        // Do not scale our image because tilesets are made for the desired size of the tiles they contain 1:1.
+        tilesetLoadOptions.inScaled = false;
+
+        // Create a Tileset for each one.
         Tileset[] tilesets = new Tileset[tilesetNodeListLength];
         for (int i = 0; i < tilesetNodeListLength; i++)
         {
@@ -85,8 +116,10 @@ public class TileMapLoader
             else
             {
                 // The tileset was not in the cache, so we must create a new one.
-                // First, load up the image from its source, and create a Bitmap... //todo: use options to set inImmutable = true
-                Bitmap image = BitmapFactory.decodeStream(assetManager.open(tilesetImageElementSource.substring(3))); //fixme: somehow fix uri's which are relative to tmx file, they should be relative to assets folder.
+                // First, load up the image from its source, and create a Bitmap...
+                //fixme: somehow fix uri's which are relative to tmx file, they should be relative to assets folder.
+                String imagePath = tilesetImageElementSource.substring(3);
+                Bitmap image = BitmapFactory.decodeStream(assetManager.open(imagePath), null, tilesetLoadOptions);
 
                 // ...then create the new tileset...
                 tileset = new Tileset(
@@ -182,6 +215,7 @@ public class TileMapLoader
                 TILE_MAP_TILES_PER_COLUMN,
                 TILE_MAP_TILE_WIDTH_PX,
                 TILE_MAP_TILE_HEIGHT_PX,
+                customProperties,
                 tilesets,
                 layers);
     }

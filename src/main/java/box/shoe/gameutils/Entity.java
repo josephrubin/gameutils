@@ -35,12 +35,12 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
     // Enforce cleanup method call.
     private boolean cleaned = false;
 
-    public Entity(RectF body)
+    public Entity(AABB body)
     {
         this(body, Vector.ZERO, Vector.ZERO);
     }
 
-    public Entity(RectF body, Vector initialVelocity)
+    public Entity(AABB body, Vector initialVelocity)
     {
         this(body, initialVelocity, Vector.ZERO);
     }
@@ -51,7 +51,7 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
      * @param initialVelocity the starting velocity.
      * @param initialAcceleration the starting acceleration.
      */
-    public Entity(RectF body, Vector initialVelocity, Vector initialAcceleration)
+    public Entity(AABB body, Vector initialVelocity, Vector initialAcceleration)
     {
         // Do some dimension checks. Removing these checks could potentially be interesting,
         // but would probably not lead to behavior that is intended most of the time.
@@ -63,7 +63,7 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
         {
             throw new IllegalArgumentException("Height cannot be less than 0: " + body.height());
         }
-        this.body = new AABB(body);
+        this.body = body;
         display = new AABB(body);
         velocity = initialVelocity;
         acceleration = initialAcceleration;

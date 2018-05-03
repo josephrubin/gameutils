@@ -132,7 +132,8 @@ public class AABB extends RectF
         offsetTo(newCenterX - width() / 2, newCenterY - height() / 2);
     }
 
-    // >> Natural extension of the great RectF constructors.
+    // _____________
+    // CONSTRUCTORS.
 
     /**
      * Create a new empty AABB. All coordinates are initialized to 0.
@@ -165,5 +166,15 @@ public class AABB extends RectF
     public AABB(Rect r)
     {
         super(r);
+    }
+
+    public static AABB fromCenter(float centerX, float centerY, float edgeLength)
+    {
+        return AABB.fromCenter(centerX, centerY, edgeLength, edgeLength);
+    }
+
+    public static AABB fromCenter(float centerX, float centerY, float width, float height)
+    {
+        return new AABB(centerX - width / 2, centerY - height / 2, centerX + height / 2, centerY + height / 2);
     }
 }

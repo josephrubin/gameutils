@@ -14,15 +14,17 @@ import box.shoe.gameutils.Interpolatable;
 public class RectCamera implements Camera, Interpolatable
 {
     private RectF gamePortionBounds;
-    private AABB visibleBounds;
+    private Rect visibleBounds;
 
     private RectF interpolatedGamePortionBounds;
     private AABB interpolatedVisibleBounds;
 
+    private RectF dummyVisibilityChecker = new RectF();
+
     public RectCamera(RectF gamePortionToShow, Rect fitToVisibleBounds)
     {
-        this.gamePortionBounds = new RectF(gamePortionToShow);
-        visibleBounds = new AABB(fitToVisibleBounds);
+        this.gamePortionBounds = gamePortionToShow;
+        visibleBounds = fitToVisibleBounds;
 
         interpolatedGamePortionBounds = new RectF(this.gamePortionBounds);
         interpolatedVisibleBounds = new AABB(visibleBounds);
@@ -33,11 +35,6 @@ public class RectCamera implements Camera, Interpolatable
     public void setGamePortionToShow(RectF gamePortionToShow)
     {
         gamePortionBounds = new RectF(gamePortionToShow);
-    }
-
-    public void setVisibleBounds(RectF visibleBounds)
-    {
-        this.visibleBounds = new AABB(visibleBounds);
     }
 
     @Override
@@ -53,7 +50,8 @@ public class RectCamera implements Camera, Interpolatable
     @Override
     public boolean isVisible(Entity entity)
     {
-        return entity.display.intersects(visibleBounds);
+        dummyVisibilityChecker.set(visibleBounds);
+        return entity.display.intersects(dummyVisibilityChecker);
     }
 
     // More visibility checks given that we are a rectangle.

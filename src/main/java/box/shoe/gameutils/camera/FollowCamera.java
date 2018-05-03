@@ -4,49 +4,55 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
+import android.support.annotation.RestrictTo;
 
 import box.shoe.gameutils.AABB;
 import box.shoe.gameutils.Entity;
 
 public class FollowCamera implements Camera
 {
-    private Entity follow;
+    protected Entity target;
 
-    private AABB gamePortionToShow;
-    private RectCamera rectCamera;
+    protected AABB gamePortionToShow;
+    protected RectCamera rectCamera;
 
     private RectF outerBounds = null;
 
-    public FollowCamera(@NonNull Entity entityToFollow, float gamePortionToShowWidth, float gamePortionToShowHeight, Rect fitToVisibleBounds)
+    public FollowCamera(@NonNull Entity target, float gamePortionToShowWidth, float gamePortionToShowHeight, Rect fitToVisibleBounds)
     {
-        follow = entityToFollow;
+        this.target = target;
 
         gamePortionToShow = new AABB(0, 0, gamePortionToShowWidth, gamePortionToShowHeight);
-        gamePortionToShow.offsetCenterTo(follow.body.centerX(), follow.body.centerY());
+        gamePortionToShow.offsetCenterTo(this.target.body.centerX(), this.target.body.centerY());
         rectCamera = new RectCamera(gamePortionToShow, fitToVisibleBounds);
     }
 
-    public FollowCamera(@NonNull Entity entityToFollow, float gamePortionToShowWidth, float gamePortionToShowHeight, RectF outerBounds, Rect fitToVisibleBounds)
+    public FollowCamera(@NonNull Entity target, float gamePortionToShowWidth, float gamePortionToShowHeight, RectF outerBounds, Rect fitToVisibleBounds)
     {
-        follow = entityToFollow;
+        this.target = target;
 
-        setOuterBounds(outerBounds);
+        this.outerBounds = outerBounds;
 
         gamePortionToShow = new AABB(0, 0, gamePortionToShowWidth, gamePortionToShowHeight);
-        gamePortionToShow.offsetCenterTo(follow.body.centerX(), follow.body.centerY());
+        gamePortionToShow.offsetCenterTo(this.target.body.centerX(), this.target.body.centerY());
         rectCamera = new RectCamera(gamePortionToShow, fitToVisibleBounds);
     }
 
     @Override
     public void roll(Canvas canvas)
     {
-        // Follow player.
-        gamePortionToShow.offsetCenterTo(follow.body.centerX(), follow.body.centerY());
+        followTarget();
 
         handleOuterBounds();
 
         rectCamera.setGamePortionToShow(gamePortionToShow);
         rectCamera.roll(canvas);
+    }
+
+    @RestrictTo(RestrictTo.Scope.SUBCLASSES)
+    protected void followTarget()
+    {
+        gamePortionToShow.offsetCenterTo(target.body.centerX(), target.body.centerY());
     }
 
     private void handleOuterBounds()
@@ -88,12 +94,6 @@ public class FollowCamera implements Camera
                 }
             }
         }
-    }
-
-    // Null indicates no bounds.
-    public void setOuterBounds(RectF outerBounds)
-    {
-        this.outerBounds = new RectF(outerBounds);
     }
 
     @Override

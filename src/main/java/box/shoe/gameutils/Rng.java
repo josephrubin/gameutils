@@ -4,20 +4,20 @@ import java.util.Random;
 
 /**
  * Created by Joseph on 3/6/2018.
- * A single Random instance to be shared among all objects that need RNG.
+ * A single Random instance to be shared among all objects that need Rng.
  * All public methods of java.util.Random are forwarded through,
  * and some additional methods are added, for convenience.
- * For a deterministic game, make sure to call RNG.setSeed(long seed) when the game starts.
+ * For a deterministic game, make sure to call Rng.setSeed(long seed) when the game starts.
  */
 
-public class RNG
+public class Rng
 {
     private static final Random RANDOM = new Random();
 
     /**
      * No instantiation.
      */
-    private RNG() {}
+    private Rng() {}
 
     // ___________________
     // ADDITIONAL METHODS.

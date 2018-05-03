@@ -103,7 +103,7 @@ public abstract class AbstractGLSurfaceViewScreen// extends GLSurfaceView implem
 
         requestRender();
 
-        // Create debug artifacts, which follow the actual in-game positions, and box each Entity.
+        // Create debug artifacts, which target the actual in-game positions, and box each Entity.
 
         preparedToPaint = false;
     }

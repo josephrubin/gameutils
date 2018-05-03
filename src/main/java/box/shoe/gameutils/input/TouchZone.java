@@ -139,7 +139,7 @@ public class TouchZone implements Touchable
     @RestrictTo(RestrictTo.Scope.SUBCLASSES)
     protected RectF getBounds()
     {
-        return new RectF(bounds);
+        return bounds;
     }
 
     public static class ExclusivePointerMode
