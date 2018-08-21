@@ -28,9 +28,6 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
     // Vector which represents how many x and y units the velocity will change by per update.
     public Vector acceleration;
 
-    // Entities can have children, who stick to their parent. todo: remove?
-    private Collection<Entity> children;
-
     // Enforce cleanup method call.
     private boolean cleaned = false;
 
@@ -66,17 +63,6 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
         display = new BoundingBox(body);
         velocity = initialVelocity;
         acceleration = initialAcceleration;
-        children = new HashSet<>();
-    }
-
-    public void addChild(Entity child)
-    {
-        children.add(child);
-    }
-
-    public void removeChild(Entity child)
-    {
-        children.remove(child);
     }
 
     /**
@@ -89,9 +75,6 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
     @CallSuper
     public void update()
     {
-        float saveCenterX = body.centerX();
-        float saveCenterY = body.centerY();
-
         // We will update velocity based on acceleration first,
         // and update position based on velocity second.
         // This is called Semi-Implicit Euler and is a more accurate form of integration
@@ -105,12 +88,6 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
 
         // Update position based on new velocity.
         updatePosition();
-
-        // We do not update all children, but we do offset them by the amount of their parent. todo: remove?
-        for (Entity child : children)
-        {
-            child.body.offset(body.centerX() - saveCenterX, body.centerY() - saveCenterY);
-        }
     }
 
     /**
