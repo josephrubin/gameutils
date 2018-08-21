@@ -33,6 +33,23 @@ public class Rng
         return RANDOM.nextInt(max + 1 - min) + min;
     }
 
+    public static Direction nextDirection()
+    {
+        switch (intFrom(0, 3))
+        {
+            case 0:
+                return Direction.WEST;
+            case 1:
+                return Direction.NORTH;
+            case 2:
+                return Direction.EAST;
+            case 3:
+                return Direction.SOUTH;
+            default:
+                throw new Error("Impossible execution: invalid random int generation.");
+        }
+    }
+
     // ___________________
     // FORWARDING METHODS.
 

@@ -6,7 +6,7 @@ package box.shoe.gameutils;
 
 public interface Interpolatable
 {
-    int getInterpValuesArrayMaxIndex();
+    int getInterpValuesArrayMaxIndex(); //todo: should use a count, not a max index.
 
     void saveInterpValues(float[] out);
     void loadInterpValues(float[] in);

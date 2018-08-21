@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-import box.shoe.gameutils.AABB;
+import box.shoe.gameutils.BoundingBox;
 import box.shoe.gameutils.Entity;
 import box.shoe.gameutils.Interpolatable;
 
@@ -17,7 +17,7 @@ public class RectCamera implements Camera, Interpolatable
     private Rect visibleBounds;
 
     private RectF interpolatedGamePortionBounds;
-    private AABB interpolatedVisibleBounds;
+    private BoundingBox interpolatedVisibleBounds;
 
     private RectF dummyVisibilityChecker = new RectF();
 
@@ -27,7 +27,7 @@ public class RectCamera implements Camera, Interpolatable
         visibleBounds = fitToVisibleBounds;
 
         interpolatedGamePortionBounds = new RectF(this.gamePortionBounds);
-        interpolatedVisibleBounds = new AABB(visibleBounds);
+        interpolatedVisibleBounds = new BoundingBox(visibleBounds);
 
         INTERPOLATABLE_SERVICE.addMember(this);
     }

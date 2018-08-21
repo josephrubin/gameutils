@@ -9,7 +9,8 @@ import java.util.Set;
 import box.shoe.gameutils.CollectionUtils;
 
 /**
- * Created by Joseph on 3/21/2018.
+ * An item whose internal state can be exactly one of a predefined collection,
+ * and whose current state can be queried at any time.
  */
 
 public class StateMachine

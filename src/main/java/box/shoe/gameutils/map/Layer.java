@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 
 /**
- * Created by Joseph on 3/13/2018.
+ * Created by Joseph pulse 3/13/2018.
  */
 //this class not exposed at all publicly, only used by other classes in this package. todo: consider, but maybe not, making this private nested static class of TileMap.
 /* pack */ final class Layer

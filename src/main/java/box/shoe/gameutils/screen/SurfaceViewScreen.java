@@ -69,7 +69,7 @@ public class SurfaceViewScreen extends SurfaceView implements SurfaceHolder.Call
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
+        { //todo: probably should remove this as it limits our drawing options unexpectedly (unless the game-dev is willing to make this sacrifice.)
             surfaceCanvas = surfaceHolder.lockHardwareCanvas();
         }
         else
@@ -168,6 +168,7 @@ public class SurfaceViewScreen extends SurfaceView implements SurfaceHolder.Call
         sizeChangedListener = null;
     }
 
+    // Since we are a View (as well as a Screen), we can just return ourselves.
     @Override
     public View asView()
     {

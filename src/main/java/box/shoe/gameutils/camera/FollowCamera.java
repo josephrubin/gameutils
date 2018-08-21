@@ -6,14 +6,14 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 
-import box.shoe.gameutils.AABB;
+import box.shoe.gameutils.BoundingBox;
 import box.shoe.gameutils.Entity;
 
 public class FollowCamera implements Camera
 {
     protected Entity target;
 
-    protected AABB gamePortionToShow;
+    protected BoundingBox gamePortionToShow;
     protected RectCamera rectCamera;
 
     private RectF outerBounds = null;
@@ -22,7 +22,7 @@ public class FollowCamera implements Camera
     {
         this.target = target;
 
-        gamePortionToShow = new AABB(0, 0, gamePortionToShowWidth, gamePortionToShowHeight);
+        gamePortionToShow = new BoundingBox(0, 0, gamePortionToShowWidth, gamePortionToShowHeight);
         gamePortionToShow.offsetCenterTo(this.target.body.centerX(), this.target.body.centerY());
         rectCamera = new RectCamera(gamePortionToShow, fitToVisibleBounds);
     }
@@ -33,7 +33,7 @@ public class FollowCamera implements Camera
 
         this.outerBounds = outerBounds;
 
-        gamePortionToShow = new AABB(0, 0, gamePortionToShowWidth, gamePortionToShowHeight);
+        gamePortionToShow = new BoundingBox(0, 0, gamePortionToShowWidth, gamePortionToShowHeight);
         gamePortionToShow.offsetCenterTo(this.target.body.centerX(), this.target.body.centerY());
         rectCamera = new RectCamera(gamePortionToShow, fitToVisibleBounds);
     }

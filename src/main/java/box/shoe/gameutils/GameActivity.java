@@ -13,6 +13,7 @@ import android.view.ViewStub;
 import box.gift.gameutils.R;
 import box.shoe.gameutils.engine.Engine;
 import box.shoe.gameutils.engine.Game;
+import box.shoe.gameutils.rumble.Rumble;
 import box.shoe.gameutils.screen.Screen;
 import box.shoe.gameutils.screen.SurfaceViewScreen;
 
@@ -22,8 +23,9 @@ import box.shoe.gameutils.screen.SurfaceViewScreen;
 
 public abstract class GameActivity extends Activity
 {
+    // Keep track of the game components that are in use at the moment.
     private Engine currentEngine;
-    private Game currentGame;
+    private Game   currentGame;
     private Screen currentScreen;
 
     // References to Views that we will need in order to switch what we display to the user.
@@ -40,11 +42,19 @@ public abstract class GameActivity extends Activity
     {
         super.onCreate(savedInstanceState);
 
+        staticInitialization();
+
         // Our master layout contains all the sections that we want to display, without switching contexts later on.
         setContentView(R.layout.master_layout);
 
         // Programmatically get the Menu section layout and inflate the stub.
         inflateMenu();
+    }
+
+    // Our purpose is to initialize any classes who have a static init method that must be called before their use.
+    private void staticInitialization()
+    {
+        Rumble.init(getApplicationContext());
     }
 
     // Whenever we launch, grab the references dependant on the View hierarchy.
@@ -73,6 +83,9 @@ public abstract class GameActivity extends Activity
         }
     }
 
+    // Always resume the game engine when we are no longer visually obstructed.
+    // Another possibility would be to show the pause menu.
+    //TODO: make this an option.
     @Override
     protected void onResume()
     {
@@ -84,6 +97,7 @@ public abstract class GameActivity extends Activity
         }
     }
 
+    // When our app is killed, clean everything up as best as we can.
     @Override
     protected void onDestroy()
     {
@@ -118,7 +132,7 @@ public abstract class GameActivity extends Activity
         toGameSection();
         gameScreenView.addView(currentScreen.asView());
 
-        // ...and start the Game.
+        // ...and start the game.
         currentEngine.startGame();
     }
 
@@ -165,18 +179,21 @@ public abstract class GameActivity extends Activity
         }
         catch (IllegalArgumentException e)
         {
-            Log.w(getString(R.string.library_name), "Main menu could not be loaded. Did you return a valid layout resource id from provideMainMenuLayoutResId()? Using default.");
+            Log.w(getString(R.string.library_name), "Main menu could not be loaded." +
+                    "Did you return a valid layout resource id from provideMainMenuLayoutResId()? Using default.");
             stub.setLayoutResource(R.layout.default_main_menu_layout);
             stub.inflate();
         }
     }
 
+    // Move to the menu section no matter which section we were on before.
     private void toMenuSection()
     {
         gameSection.setVisibility(View.GONE);
         menuSection.setVisibility(View.VISIBLE);
     }
 
+    // Move to the game section no matter which section we were on before.
     private void toGameSection()
     {
         menuSection.setVisibility(View.GONE);
@@ -235,12 +252,13 @@ public abstract class GameActivity extends Activity
         }
         else
         {
+            // Elevate this event (to the OS).
             super.onBackPressed();
         }
     }
 
-    // When we lose focus, pause the game.
     // When we gain focus, resume the game.
+    // When we lose focus, pause the game.
     // If we are not in game, do nothing.
     @Override
     public void onWindowFocusChanged(boolean hasFocus)

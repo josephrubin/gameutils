@@ -3,7 +3,7 @@ package box.shoe.gameutils.input;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 
-import box.shoe.gameutils.AABB;
+import box.shoe.gameutils.BoundingBox;
 import box.shoe.gameutils.Vector;
 
 public class JoystickZone implements VectorTouchable
@@ -15,7 +15,7 @@ public class JoystickZone implements VectorTouchable
 
     private Joystick currentJoystick;
     private Vector activeTouchVector;
-    private AABB currentJoystickBounds;
+    private BoundingBox currentJoystickBounds;
 
     public JoystickZone(RectF bounds, float joystickWidth, float joystickHeight)
     {
@@ -32,7 +32,7 @@ public class JoystickZone implements VectorTouchable
         {
             if (TouchConstants.DOWN_ACTIONS.contains(motionEvent.getActionMasked()))
             {
-                currentJoystickBounds = new AABB(0, 0, joystickWidth, joystickHeight);
+                currentJoystickBounds = new BoundingBox(0, 0, joystickWidth, joystickHeight);
                 currentJoystickBounds.offsetCenterTo(motionEvent.getX(motionEvent.getActionIndex()), motionEvent.getY(motionEvent.getActionIndex()));
                 currentJoystick = new Joystick(currentJoystickBounds, motionEvent.getPointerId(motionEvent.getActionIndex()));
             }

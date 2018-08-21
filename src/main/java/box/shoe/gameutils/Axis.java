@@ -1,5 +1,9 @@
 package box.shoe.gameutils;
 
+/**
+ * A game must be able to keep track of the basis vectors on which it relies.
+ * We define two simple Axes and their associated Directions.
+ */
 public class Axis
 {
     public static final Axis X = new Axis(Direction.EAST, Direction.WEST);

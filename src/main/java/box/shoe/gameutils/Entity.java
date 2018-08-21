@@ -1,6 +1,5 @@
 package box.shoe.gameutils;
 
-import android.graphics.RectF;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
@@ -20,27 +19,27 @@ import box.gift.gameutils.BuildConfig;
 public class Entity implements Updatable, Interpolatable /* Poolable*/
 {
     // The game-space which is occupied by this Entity.
-    public AABB body;
+    public BoundingBox body;
     // The screen-space which is occupied by this Entity.
-    public AABB display;
+    public BoundingBox display;
 
     // Vector which represents how many x and y units the body will offset by per update.
     public Vector velocity;
     // Vector which represents how many x and y units the velocity will change by per update.
     public Vector acceleration;
 
-    // Entities can have children, who stick to their parent.
+    // Entities can have children, who stick to their parent. todo: remove?
     private Collection<Entity> children;
 
     // Enforce cleanup method call.
     private boolean cleaned = false;
 
-    public Entity(AABB body)
+    public Entity(BoundingBox body)
     {
         this(body, Vector.ZERO, Vector.ZERO);
     }
 
-    public Entity(AABB body, Vector initialVelocity)
+    public Entity(BoundingBox body, Vector initialVelocity)
     {
         this(body, initialVelocity, Vector.ZERO);
     }
@@ -51,7 +50,7 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
      * @param initialVelocity the starting velocity.
      * @param initialAcceleration the starting acceleration.
      */
-    public Entity(AABB body, Vector initialVelocity, Vector initialAcceleration)
+    public Entity(BoundingBox body, Vector initialVelocity, Vector initialAcceleration)
     {
         // Do some dimension checks. Removing these checks could potentially be interesting,
         // but would probably not lead to behavior that is intended most of the time.
@@ -64,7 +63,7 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
             throw new IllegalArgumentException("Height cannot be less than 0: " + body.height());
         }
         this.body = body;
-        display = new AABB(body);
+        display = new BoundingBox(body);
         velocity = initialVelocity;
         acceleration = initialAcceleration;
         children = new HashSet<>();
@@ -95,7 +94,7 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
 
         // We will update velocity based on acceleration first,
         // and update position based on velocity second.
-        // This is apparently called Semi-Implicit Euler and is a more accurate form of integration
+        // This is called Semi-Implicit Euler and is a more accurate form of integration
         // when acceleration is not constant.
 
         // By default, acceleration is preserved through updates, but subclasses can change this behavior,
@@ -107,7 +106,7 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
         // Update position based on new velocity.
         updatePosition();
 
-        // We do not update all children, but we do offset them by the amount of their parent.
+        // We do not update all children, but we do offset them by the amount of their parent. todo: remove?
         for (Entity child : children)
         {
             child.body.offset(body.centerX() - saveCenterX, body.centerY() - saveCenterY);
@@ -138,6 +137,12 @@ public class Entity implements Updatable, Interpolatable /* Poolable*/
         body.offset(velocity.getX(), velocity.getY());
     }
 
+    /**
+     * Creates a vector from the center of this Entity to the center of another.
+     * It's magnitude is the distance between the two Entities.
+     * @param other the Entity toward which the vector is calculated.
+     * @return the vector from the center of this Entity to the center of `other`.
+     */
     public Vector vectorTo(@NonNull Entity other)
     {
         return Vector.fromCartesian(other.body.centerX() - body.centerX(), other.body.centerY() - body.centerY());

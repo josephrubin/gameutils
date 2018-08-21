@@ -28,6 +28,7 @@ import box.gift.gameutils.BuildConfig;
 import box.gift.gameutils.R;
 import box.shoe.gameutils.Interpolatable;
 import box.shoe.gameutils.Interpolation;
+import box.shoe.gameutils.rumble.Rumble;
 import box.shoe.gameutils.screen.Screen;
 
 /**
@@ -325,7 +326,7 @@ public class Engine //TODO: redo input system. make it easy, usable.
 
                 if (pastOut.length != currentOut.length)
                 {
-                    throw new IllegalStateException("Interpolatable " + interpolatable + " does not consistantly " +
+                    throw new IllegalStateException("Interpolatable " + interpolatable + " does not consistently " +
                             "save the same amount of interp values!");
                 }
 
@@ -709,6 +710,9 @@ public class Engine //TODO: redo input system. make it easy, usable.
             {
                 e.printStackTrace();
             }
+
+            // Now that we have paused, stop any other system threads we may have been using.
+            Rumble.stop();
 
             paused = true;
         }

@@ -7,12 +7,12 @@ import android.support.annotation.NonNull;
 import org.jetbrains.annotations.Contract;
 
 /**
- * Created by Joseph on 10/21/2017.
- * A getMagnitude and a direction in 2D space.
+ * A magnitude and a direction in 2D space.
+ *
  * This class is IMMUTABLE, so remember to use method return values (the original Vectors will not change).
  * Any method which returns a Vector need not create a new one. If possible, it is able to return one
  * of the arguments itself (e.g. onlyX returns the argument if the argument already has Y == 0).
- * This class only has float precision.
+ * This class only has float precision to make it more compatible with Android graphics frameworks.
  */
 
 public final class Vector //TODO: could change to double precision and cast to float when returning, but that may be unnecessary.
@@ -73,8 +73,8 @@ public final class Vector //TODO: could change to double precision and cast to f
 
     /**
      * Constructs a Vector from cartesian coordinate values.
-     * @param x the X length (will be casted to float)
-     * @param y the Y length (will be casted to float)
+     * @param x the X length (will be cast to float)
+     * @param y the Y length (will be cast to float)
      * @return a Vector with the specified X and Y values, after casting them to float.
      */
     @NonNull
@@ -97,8 +97,8 @@ public final class Vector //TODO: could change to double precision and cast to f
 
     /**
      * Constructs a Vector from polar coordinate values.
-     * @param magnitude the length (will be casted to float)
-     * @param thetaRadians the angle in radians (will be casted to float)
+     * @param magnitude the length (will be cast to float)
+     * @param thetaRadians the angle in radians (will be cast to float)
      * @return a Vector from the specified getMagnitude and theta from the origin (CCW from +x).
      */
     @NonNull
@@ -120,15 +120,20 @@ public final class Vector //TODO: could change to double precision and cast to f
     }
 
     /**
-     * Calculates the getMagnitude (length) of this Vector
-     * @return the Vector's getMagnitude
+     * Calculates the magnitude (length) of this Vector.
+     * @return the Vector's magnitude.
      */
     public float getMagnitude()
     {
-        // Equivalent of Math.sqrt(this.dot(this))
+        // Equivalent to Math.sqrt(this.dot(this)).
         return (float) Math.sqrt((X * X) + (Y * Y));
     }
 
+    /**
+     * Calculates the theta (angle) that this Vector makes with the horizontal.
+     * Guaranteed to be equivalent to Math.atan2(getY(), getX()).
+     * @return the Vector's theta.
+     */
     public double getTheta()
     {
         return Math.atan2(Y, X);
@@ -147,7 +152,7 @@ public final class Vector //TODO: could change to double precision and cast to f
         // Since we cannot scale by 1/0 we must throw an exception when this.equals(Vector.ZERO).
         if (magnitude == 0)
         {
-            throw new ArithmeticException("Vector getMagnitude is 0. Cannot create unit vector.");
+            throw new ArithmeticException("Vector magnitude is 0. Cannot create unit vector.");
         }
         return this.scale(1 / magnitude);
     }

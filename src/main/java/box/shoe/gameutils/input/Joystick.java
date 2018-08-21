@@ -34,7 +34,7 @@ public class Joystick implements VectorTouchable
 
     /*
         Create a joystick only allowing one pointer id to interact with it.
-        Note that when pointers go p they lose their id's so this is best for a temporary joystick,
+        Note that when pointers on p they lose their id's so this is best for a temporary joystick,
         such as one created by a JoystickZone.
      */
     public Joystick(RectF bounds, int specificPointerIdInteractable)

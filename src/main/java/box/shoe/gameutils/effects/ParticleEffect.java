@@ -2,12 +2,11 @@ package box.shoe.gameutils.effects;
 
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.RectF;
 
 import java.util.Collection;
 import java.util.LinkedList;
 
-import box.shoe.gameutils.AABB;
+import box.shoe.gameutils.BoundingBox;
 import box.shoe.gameutils.Entity;
 import box.shoe.gameutils.Vector;
 
@@ -49,7 +48,7 @@ public class ParticleEffect implements Effect
     {
         private int updatesLeft;
 
-        public Particle(int duration, AABB body, Vector initialVelocity, Vector initialAcceleration)
+        public Particle(int duration, BoundingBox body, Vector initialVelocity, Vector initialAcceleration)
         {
             super(body, initialVelocity, initialAcceleration);
             updatesLeft = duration;
